@@ -1,0 +1,1608 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Gump</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gump">
+<meta name="theme-color" content="#e2643a">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@700;800;900&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;padding:0}
+img{max-width:100%}
+[hidden]:not([hidden=until-found i]){display:none!important}
+:root {
+  --bg: #f5ede0; --surface: #fffaf3; --ink: #2b2118; --muted: #7c6a56; --line: #e7d9c4;
+  --accent: #c8322b; --accent-2: #e2643a; --accent-ink: #fffaf3;
+  --easy: #5d8a36; --quality: #d3861c; --long: #2f6fa3; --gym: #34507f; --race: #c8322b; --cross: #8b4a9c;
+  --soft: #f1e2cc; --sky-1: #f6b764; --sky-2: #e2643a; --sky-3: #b8352d; --mesa: #9c3f24; --asphalt: #3b3029; --stripe: #f4cf55; --title-red: #b3161b;
+  --f-display: "Rubik", "Arial Black", system-ui, sans-serif;
+  --f-title: "Rubik", "Arial Black", system-ui, sans-serif;
+  --f-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #17120d; --surface: #221a13; --ink: #f3e8d8; --muted: #b19d85; --line: #3a2e22;
+  --accent: #ff6b55; --accent-2: #f08a3c; --accent-ink: #1a120c; --easy: #9cc36a; --quality: #f0a94a; --long: #73aee0;
+  --gym: #93acdf; --race: #ff6b55; --cross: #c79be0; --soft: #33261b;
+  --sky-1: #4a3a6b; --sky-2: #a2483a; --sky-3: #5a2330; --mesa: #3a1d1a; --asphalt: #120d0a; --stripe: #d9b445; --title-red: #ff5d4d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #17120d; --surface: #221a13; --ink: #f3e8d8; --muted: #b19d85; --line: #3a2e22;
+  --accent: #ff6b55; --accent-2: #f08a3c; --accent-ink: #1a120c; --easy: #9cc36a; --quality: #f0a94a; --long: #73aee0;
+  --gym: #93acdf; --race: #ff6b55; --cross: #c79be0; --soft: #33261b;
+  --sky-1: #4a3a6b; --sky-2: #a2483a; --sky-3: #5a2330; --mesa: #3a1d1a; --asphalt: #120d0a; --stripe: #d9b445; --title-red: #ff5d4d; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5 }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 16px 180px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; letter-spacing: .01em }
+.num { font-variant-numeric: tabular-nums }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums }
+.label { font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); font-weight: 600 }
+
+.bib { background: var(--surface); border-radius: 24px; padding: 20px; display: grid; gap: 18px; grid-template-columns: 1fr auto; position: relative; overflow: hidden }
+.bib h2 { font-family: var(--f-title); font-size: clamp(26px, 6vw, 34px); line-height: 1.05 }
+.bib h2 span { color: var(--accent) }
+.count { text-align: right }
+.count b { font-family: var(--f-title); font-size: clamp(44px, 9vw, 68px); line-height: .9; display: block; color: var(--accent) }
+.settings { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; border-top: 1px dashed var(--line); padding-top: 16px }
+.field { display: grid; gap: 4px }
+input, select, textarea { font: inherit; color: var(--ink); background: var(--bg); border: 2px solid var(--line); border-radius: 12px; padding: 8px 10px; min-width: 0 }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.paces { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted) }
+.paces span b { color: var(--ink); font-family: var(--f-mono); font-weight: 600 }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 1px }
+
+.progress { margin-top: 18px; display: grid; gap: 6px }
+.bar { height: 10px; border-radius: 99px; background: var(--soft); overflow: hidden }
+.bar i { display: block; height: 100%; width: 0; transition: width .4s; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--accent-2)) }
+.progress-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); gap: 8px; flex-wrap: wrap }
+
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; margin: 0; background: var(--surface); border-top: 1px solid var(--line);
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)) }
+.tab { font-family: var(--f-body); font-size: 12.5px; font-weight: 700; background: none; border: 0; display: grid; justify-items: center; gap: 2px; padding: 6px 4px; color: var(--muted); cursor: pointer }
+.tab .ic { font-size: 24px; line-height: 1 }
+.tab[aria-selected="true"] { color: var(--accent) }
+#view-today, #view-plan, #view-log { margin-top: 22px }
+
+.weeks { display: grid; gap: 10px }
+details.week { background: var(--surface); border: 2px solid var(--line); border-radius: 20px }
+details.week.current { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) }
+summary { list-style: none; cursor: pointer; padding: 14px 16px; display: grid; grid-template-columns: auto 1fr auto; gap: 4px 14px; align-items: center }
+summary::-webkit-details-marker { display: none }
+.wk-no { font-family: var(--f-display); font-weight: 900; font-size: 30px; line-height: 1; width: 2.2ch; text-align: center; color: var(--accent) }
+.wk-meta { min-width: 0 }
+.wk-meta h3 { font-size: 17px; font-weight: 800 }
+.wk-meta div { font-size: 13px; color: var(--muted) }
+.wk-side { text-align: right; font-size: 13px; color: var(--muted) }
+.wk-side b { font-family: var(--f-mono); color: var(--ink); font-size: 14px }
+.chip { display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 2px 7px; border-radius: 99px; background: var(--soft); color: var(--accent); margin-left: 6px; vertical-align: 2px }
+.chip.done { background: color-mix(in srgb, var(--easy) 18%, transparent); color: var(--easy) }
+.chip.brk { background: color-mix(in srgb, var(--cross) 16%, transparent); color: var(--cross) }
+.days { border-top: 1px solid var(--line); display: grid }
+.day { display: grid; grid-template-columns: 74px 1fr; gap: 4px 12px; padding: 10px 16px 10px 12px; align-items: start }
+.day + .day { border-top: 1px solid var(--line) }
+.day.rest { color: var(--muted); padding-block: 7px; font-size: 13px }
+.day.today { background: var(--soft) }
+.sessions { display: grid; gap: 10px; min-width: 0 }
+.sess { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: start; border-left: 4px solid transparent; padding-left: 10px }
+.sess.easy { border-left-color: var(--easy) } .sess.quality { border-left-color: var(--quality) } .sess.long { border-left-color: var(--long) }
+.sess.gym { border-left-color: var(--gym) } .sess.race { border-left-color: var(--race) } .sess.cross { border-left-color: var(--cross) }
+.sess.gym .d-title { font-weight: 600 }
+.d-date { font-size: 13px; color: var(--muted); line-height: 1.3 }
+.d-date b { display: block; color: var(--ink); font-weight: 700; text-transform: capitalize }
+.d-body { min-width: 0 }
+.d-title { font-weight: 700 }
+.d-title .km { font-family: var(--f-mono); font-weight: 600; margin-left: 4px }
+.d-desc { font-size: 13.5px; color: var(--muted) }
+.d-pace { font-family: var(--f-mono); font-size: 12.5px; color: var(--ink); margin-top: 2px }
+.sess.is-done .d-title { text-decoration: line-through; text-decoration-color: var(--muted); color: var(--muted) }
+.d-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap }
+.check { width: 30px; height: 30px; border-radius: 10px; border: 2px solid var(--line); background: var(--surface); cursor: pointer; display: grid; place-items: center; color: transparent; font-size: 16px; font-weight: 800; padding: 0 }
+.check[aria-pressed="true"] { background: var(--easy); border-color: var(--easy); color: var(--accent-ink) }
+.ghost { background: none; border: 2px solid var(--line); color: var(--muted); border-radius: 999px; font: inherit; font-size: 12.5px; font-weight: 600; padding: 5px 10px; cursor: pointer; text-decoration: none }
+.ghost:hover { color: var(--accent); border-color: var(--accent) }
+
+.card { background: var(--surface); border-radius: 24px; padding: 16px }
+.log-form { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px }
+.log-form .wide { grid-column: 1 / -1 }
+.btn { background: var(--accent); color: var(--accent-ink); border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); border-radius: 999px; font-family: var(--f-display); font-weight: 800; letter-spacing: .01em; padding: 10px 16px; cursor: pointer; font-size: 15px }
+.btn:active { transform: translate(2px, 2px); box-shadow: none }
+.form-foot { grid-column: 1 / -1; display: flex; gap: 12px; align-items: center; flex-wrap: wrap }
+.hint { font-size: 13px; color: var(--muted) }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 14px 0 }
+.stat { background: var(--surface); border-radius: 20px; padding: 12px 14px }
+.stat b { display: block; font-family: var(--f-display); font-size: 30px; font-weight: 900; line-height: 1.1; color: var(--accent) }
+.table-wrap { overflow-x: auto; background: var(--surface); border-radius: 24px }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600 }
+tr:last-child td { border-bottom: 0 }
+td.r, th.r { text-align: right }
+.feel { white-space: nowrap }
+.empty { padding: 28px 16px; text-align: center; color: var(--muted) }
+.status { font-size: 12px; color: var(--muted); margin-top: 10px; text-align: right }
+
+.today-nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap }
+.today-nav h2 { font-family: var(--f-title); font-size: 24px; font-weight: 900; flex: 1; min-width: 0 }
+.today-nav h2::first-letter { text-transform: uppercase }
+.navbtn { width: 38px; height: 38px; border-radius: 999px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); font-size: 20px; line-height: 1; cursor: pointer }
+.today-sub { margin: 2px 0 14px; font-size: 13.5px; color: var(--muted) }
+.tcards { display: grid; gap: 12px }
+.tcard { background: var(--surface); border-radius: 24px; padding: 16px; display: grid; gap: 10px; min-width: 0 }
+.tcard .label { color: var(--accent) }
+.tcard.easy .label { color: var(--easy) } .tcard.quality .label { color: var(--quality) } .tcard.long .label { color: var(--long) } .tcard.race .label { color: var(--race) }
+.tcard.gym .label { color: var(--gym) } .tcard.cross .label { color: var(--cross) }
+.tcard-head { display: flex; justify-content: space-between; gap: 12px; align-items: start }
+.tcard h3 { font-family: var(--f-title); font-size: 24px; font-weight: 900; line-height: 1.1 }
+.tcard h3 .mono { font-size: 18px; font-weight: 600; margin-left: 6px }
+.ex-list { display: grid; gap: 8px }
+.ex { border: 2px solid var(--line); border-radius: 18px; padding: 12px; display: grid; gap: 6px; min-width: 0 }
+.ex.complete { background: color-mix(in srgb, var(--easy) 10%, transparent); border-color: color-mix(in srgb, var(--easy) 45%, var(--line)) }
+.ex-name { font-weight: 700 }
+.ex-meta { font-family: var(--f-mono); font-size: 13px; color: var(--ink) }
+.ex-tip { font-size: 13px; color: var(--muted); font-style: italic }
+.sets { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 2px }
+.set { min-width: 40px; height: 36px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; font-variant-numeric: tabular-nums }
+.set[aria-pressed="true"] { background: var(--gym); border-color: var(--gym); color: var(--accent-ink) }
+.tcard.cross .set[aria-pressed="true"] { background: var(--cross); border-color: var(--cross) }
+.ex-res { flex: 1 1 140px; font-size: 13px; padding: 7px 9px }
+
+.timerbar { position: fixed; z-index: 20; display: flex; align-items: center; gap: 12px;
+  left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  border-radius: 20px; overflow: hidden; padding: 12px 16px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--accent-ink);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--accent) 35%, transparent) }
+.timerbar b { font-family: var(--f-display); font-size: 36px; line-height: 1; min-width: 3.2ch; font-variant-numeric: tabular-nums }
+.timerbar .tlabel { flex: 1; min-width: 0; font-size: 14px; font-weight: 600 }
+.timerbar button { background: transparent; border: 1px solid currentColor; color: inherit; border-radius: 8px; padding: 7px 10px; font: inherit; font-size: 13px; cursor: pointer }
+.tprog { position: absolute; left: 0; top: 0; height: 3px; width: 0; background: var(--accent-ink); opacity: .7 }
+
+.appbar { position: relative; overflow: hidden; color: #fffaf3; border-radius: 0 0 28px 28px;
+  background: linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 55%, var(--sky-3) 100%);
+  padding-block: 22px 0; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)) }
+.appbar-in { max-width: 860px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; z-index: 1 }
+.appbar h1 { font-family: var(--f-title); font-weight: 900; font-size: clamp(52px, 15vw, 76px); letter-spacing: -.01em; line-height: 1; color: var(--title-red); text-shadow: 0 3px 0 rgba(43, 26, 16, .28) }
+.appbar p { margin: 6px 0 0; font-family: var(--f-display); font-size: 14px; font-weight: 800; letter-spacing: .02em; opacity: .92 }
+.runner-head { width: clamp(118px, 30vw, 156px); height: auto; flex: none; filter: drop-shadow(0 4px 0 rgba(60, 20, 10, .25)) }
+.road { display: block; width: 100%; height: 70px; margin-top: 4px }
+.road .sky-sun { fill: #ffe3a3; opacity: .75 }
+.road .mesa { fill: var(--mesa) }
+.road .asphalt { fill: var(--asphalt) }
+.road .stripe { fill: var(--stripe) }
+.bib, .tcard, .shot, .brk { border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink) }
+.shot { display: grid; gap: 12px; margin-bottom: 12px }
+.shot h3 { font-family: var(--f-title); font-weight: 900; font-size: 22px; margin: 2px 0 4px }
+.shot .btn { justify-self: start; text-align: center }
+.vh { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none }
+.splits { display: flex; flex-wrap: wrap; gap: 2px 10px; font-family: var(--f-mono); font-size: 12px; color: var(--muted); margin-top: 4px }
+
+.backup { margin-top: 14px; display: grid; gap: 10px }
+.backup h3 { font-family: var(--f-title); font-size: 22px; font-weight: 900 }
+.backup .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center }
+/* Техника и голосовой режим */
+button.ex-name { all: unset; cursor: pointer; font-weight: 700; display: inline-flex; gap: 6px; align-items: baseline; -webkit-tap-highlight-color: transparent }
+button.ex-name .i { font-size: 12px; font-weight: 700; color: var(--accent); border: 1.5px solid currentColor; border-radius: 99px; padding: 0 6px; line-height: 1.5 }
+button.ex-name:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px }
+.coach-btn { justify-self: start }
+.sheet-bg { position: fixed; inset: 0; z-index: 40; background: rgba(20, 12, 6, .55); display: flex; align-items: flex-end; justify-content: center }
+.sheet { background: var(--surface); color: var(--ink); width: 100%; max-width: 640px; max-height: 92vh; overflow: auto; border-radius: 24px 24px 0 0; border: 2.5px solid var(--ink); border-bottom: 0;
+  padding: 18px 18px calc(22px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 12px }
+.sheet-head { display: flex; justify-content: space-between; gap: 12px; align-items: start }
+.sheet h3 { font-family: var(--f-title); font-size: 24px; font-weight: 900; line-height: 1.1 }
+.poses { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px }
+.poses figure { margin: 0; background: var(--bg); border-radius: 16px; padding: 8px 8px 6px; display: grid; gap: 2px }
+.poses figcaption { font-size: 12.5px; font-weight: 700; color: var(--muted); text-align: center }
+.fig { width: 100%; height: auto; display: block }
+.fig .fg { stroke: var(--ink) } .fig .head { fill: var(--surface) } .fig .floor { stroke: var(--line) }
+.fig .kb { fill: var(--accent) } .fig .bench { fill: var(--soft) } .fig .bag { fill: color-mix(in srgb, var(--accent) 75%, var(--ink)) }
+.fig .db { fill: var(--ink) } .fig .arr { stroke: var(--accent) } .fig .arrh { fill: var(--accent); stroke: none } .fig .pr { stroke: var(--muted) }
+.tips { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14.5px }
+.yt { justify-self: start; text-decoration: none }
+.coach { position: fixed; inset: 0; z-index: 30; background: var(--bg); color: var(--ink); display: flex; flex-direction: column;
+  padding: calc(18px + env(safe-area-inset-top, 0px)) max(18px, env(safe-area-inset-right, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px)) }
+.coach-in { max-width: 560px; width: 100%; margin: 0 auto; flex: 1; display: flex; flex-direction: column; gap: 14px; min-height: 0 }
+.coach-top { display: flex; justify-content: space-between; align-items: center; gap: 10px }
+.coach-phase { font-family: var(--f-display); font-weight: 900; font-size: 15px; text-transform: uppercase; letter-spacing: .08em; color: var(--accent) }
+.coach[data-phase="rest"] .coach-phase { color: var(--long) } .coach[data-phase="ready"] .coach-phase { color: var(--quality) }
+.coach[data-phase="reps"] .coach-phase { color: var(--easy) }
+.coach-name { font-family: var(--f-title); font-weight: 900; font-size: clamp(28px, 8vw, 40px); line-height: 1.05 }
+.coach-set { font-family: var(--f-mono); font-size: 15px }
+.coach-time { font-family: var(--f-display); font-weight: 900; font-size: clamp(84px, 30vw, 150px); line-height: 1; text-align: center; font-variant-numeric: tabular-nums; margin: auto 0 0 }
+.coach-bar { height: 12px; border-radius: 99px; background: var(--soft); overflow: hidden } .coach-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)) }
+.coach[data-phase="rest"] .coach-bar i { background: var(--long) }
+.coach-tip { font-size: 14px; color: var(--muted); font-style: italic; min-height: 1.5em }
+.coach-ctrl { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto }
+.coach-ctrl .ghost { font-size: 15px; padding: 12px; text-align: center; background: var(--surface) }
+.coach-done { font-size: 22px; padding: 18px; width: 100% }
+.opts { display: grid; gap: 8px }
+.opt { all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 2px; padding: 10px 12px; border: 2px solid var(--line); border-radius: 14px; background: var(--bg) }
+.opt b { font-weight: 800 } .opt span { font-size: 13px; color: var(--muted) }
+.opt[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)) }
+.opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.clips { display: grid; gap: 6px }
+.clip { display: flex; gap: 6px; align-items: center; flex-wrap: wrap }
+.clip-name { flex: 1 1 150px; font-weight: 700 }
+/* Перерыв в беге */
+.brk { background: color-mix(in srgb, var(--cross) 10%, var(--surface)); border-radius: 24px; padding: 14px 16px; display: grid; gap: 10px; margin-bottom: 14px }
+.brk .label { color: var(--cross) }
+.brk h3 { font-family: var(--f-title); font-size: 20px; font-weight: 900 }
+.brk-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end }
+.brk-off { margin-bottom: 14px }
+.note { font-size: 13.5px; background: var(--soft); border-radius: 12px; padding: 8px 10px }
+
+@media (max-width: 640px) {
+  .bib { grid-template-columns: 1fr }
+  .count { text-align: left }
+  .log-form, .stats { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .day { grid-template-columns: 1fr }
+  .d-date { grid-column: 1 / -1; display: flex; gap: 6px }
+  .d-date b { display: inline }
+  summary { grid-template-columns: auto 1fr }
+  .wk-side { grid-column: 2; text-align: left }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important } }
+</style>
+</head>
+<body>
+<header class="appbar">
+  <div class="appbar-in">
+    <div>
+      <h1>Gump</h1>
+      <p>Беги. Качайся. Повторяй.</p>
+    </div>
+    <svg class="runner-head" viewBox="0 0 140 156" role="img" aria-label="Бородатый бегун в красной кепке">
+      <defs>
+        <g id="dreadPaths" fill="none" stroke-linecap="round">
+          <path d="M28 58 C20 74 15 92 15 110 C15 120 13 127 10 132"/>
+          <path d="M33 59 C26 78 22 98 23 116 C24 127 21 135 18 141"/>
+          <path d="M38 62 C33 82 30 102 31 120 C32 131 30 140 28 147"/>
+          <path d="M42 66 C39 86 38 104 39 122 C40 132 39 140 38 146"/>
+        </g>
+        <g id="hairBack">
+          <use href="#dreadPaths" stroke="#2b1a10" stroke-width="10"/>
+          <use href="#dreadPaths" stroke="#6b4024" stroke-width="6.5"/>
+          <use href="#dreadPaths" stroke="#8d5a33" stroke-width="6.5" stroke-dasharray="2.5 6"/>
+        </g>
+        <g id="hairFront">
+          <path d="M37 60 C35 68 35 74 37 80" stroke="#2b1a10" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <path d="M37 60 C35 68 35 74 37 80" stroke="#6b4024" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        </g>
+        <g id="beardTex">
+          <path d="M44 108 C46 118 50 126 56 134" stroke="#8d5a33" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M56 116 C58 124 62 132 66 140" stroke="#8d5a33" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </g>
+      </defs>
+      <use href="#hairBack"/>
+      <use href="#hairBack" transform="matrix(-1 0 0 1 140 0)"/>
+      <path d="M36 62 C36 44 104 44 104 62 L104 92 C104 113 36 113 36 92 Z" fill="#f0bf95" stroke="#2b1a10" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M38 66 C38 80 40 92 44 100 L38 96 Z M102 66 C102 80 100 92 96 100 L102 96 Z" fill="#e2a679" opacity=".7"/>
+      <ellipse cx="46" cy="91" rx="6.5" ry="3.8" fill="#ee8f72" opacity=".4"/>
+      <ellipse cx="94" cy="91" rx="6.5" ry="3.8" fill="#ee8f72" opacity=".4"/>
+      <path d="M36 84 C34 113 48 145 70 151 C92 145 106 113 104 84 C100 96 94 100 88 99 C82 106 58 106 52 99 C46 100 40 96 36 84 Z" fill="#6b4024" stroke="#2b1a10" stroke-width="3" stroke-linejoin="round"/>
+      <use href="#beardTex"/>
+      <use href="#beardTex" transform="matrix(-1 0 0 1 140 0)"/>
+      <path d="M70 118 L70 142" stroke="#8d5a33" stroke-width="2" stroke-linecap="round"/>
+      <path d="M49 101 C57 93 65 94 70 98 C75 94 83 93 91 101 C83 100 77 100 70 102 C63 100 57 100 49 101 Z" fill="#583420" stroke="#2b1a10" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M63 108 Q70 113.5 77 108" stroke="#2b1a10" stroke-width="2.5" fill="#b9574a" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M47 73 Q54 68.5 62 71.5" stroke="#4a2a16" stroke-width="3.6" fill="none" stroke-linecap="round"/>
+      <path d="M93 73 Q86 68.5 78 71.5" stroke="#4a2a16" stroke-width="3.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="55" cy="80" rx="4.8" ry="5.4" fill="#fffaf3" stroke="#2b1a10" stroke-width="2.2"/>
+      <ellipse cx="85" cy="80" rx="4.8" ry="5.4" fill="#fffaf3" stroke="#2b1a10" stroke-width="2.2"/>
+      <circle cx="55.6" cy="81" r="2.7" fill="#3a2414"/><circle cx="85.6" cy="81" r="2.7" fill="#3a2414"/>
+      <circle cx="56.6" cy="79.8" r="1" fill="#fffaf3"/><circle cx="86.6" cy="79.8" r="1" fill="#fffaf3"/>
+      <path d="M70 81 C67 89 66.5 92 71 93" stroke="#b8774f" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      <use href="#hairFront"/>
+      <use href="#hairFront" transform="matrix(-1 0 0 1 140 0)"/>
+      <ellipse cx="70" cy="68" rx="30" ry="4" fill="#2b1a10" opacity=".18"/>
+      <path d="M28 60 C28 36 48 26 70 26 C92 26 112 36 112 60 Z" fill="#c8322b" stroke="#2b1a10" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M50 60 C50 40 60 29 70 27 C80 29 90 40 90 60 Z" fill="#d94a3e"/>
+      <path d="M70 27 C58 33 50 45 48 60 M70 27 C82 33 90 45 92 60" stroke="#8f201c" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M38 48 C42 38 51 32 60 30" stroke="#fffaf3" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".3"/>
+      <circle cx="70" cy="27" r="2.6" fill="#9e2420" stroke="#2b1a10" stroke-width="2"/>
+      <ellipse cx="70" cy="45" rx="21" ry="11.5" fill="#fffaf3" stroke="#2b1a10" stroke-width="2"/>
+      <ellipse cx="70" cy="45" rx="18" ry="9" fill="none" stroke="#c8322b" stroke-width="1.4"/>
+      <text x="70" y="44.2" text-anchor="middle" font-family="Rubik, 'Arial Black', sans-serif" font-weight="900" font-size="7.6" fill="#b3161b" textLength="30" lengthAdjust="spacingAndGlyphs">SAITAMA</text>
+      <text x="70" y="51.6" text-anchor="middle" font-family="Rubik, 'Arial Black', sans-serif" font-weight="800" font-size="6.4" fill="#2b1a10">2.0</text>
+      <path d="M26 59 C44 56 96 56 114 59 C118 63 116 70 108 71 C92 67 48 67 32 71 C24 70 22 63 26 59 Z" fill="#a8261f" stroke="#2b1a10" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M34 63 C52 60.5 88 60.5 106 63" stroke="#d94a3e" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>
+    </svg>
+  </div>
+  <svg class="road" viewBox="0 0 400 70" preserveAspectRatio="none" aria-hidden="true">
+    <circle class="sky-sun" cx="200" cy="26" r="20"/>
+    <path class="mesa" d="M0 44 L30 44 L36 24 L78 24 L84 44 L150 44 L156 34 L176 34 L180 44 L222 44 L228 18 L262 18 L270 44 L320 44 L326 30 L352 30 L358 44 L400 44 L400 70 L0 70 Z"/>
+    <path class="asphalt" d="M194 44 L206 44 L290 70 L110 70 Z"/>
+    <path class="stripe" d="M199.4 47 L200.6 47 L201 51 L199 51 Z M198.8 55 L201.2 55 L201.8 61 L198.2 61 Z M198 65 L202 65 L202.4 70 L197.6 70 Z"/>
+  </svg>
+</header>
+
+<div class="wrap">
+  <section class="bib">
+    <div>
+      <div class="label" id="bibLabel">4 пробежки + 5 силовых в неделю</div>
+      <h2>Марафон <span>42,195 км</span></h2>
+    </div>
+    <div class="count">
+      <div class="label">До старта</div>
+      <b class="num" id="daysLeft">—</b>
+      <div class="hint" id="daysWord">дней</div>
+    </div>
+    <div class="settings">
+      <label class="field"><span class="label">Дата забега (воскресенье)</span><input type="date" id="raceDate"></label>
+      <label class="field"><span class="label">Целевое время</span><input type="text" id="goalTime" inputmode="numeric" placeholder="4:15:00" size="8"></label>
+      <div class="field">
+        <span class="label">Твои темпы, мин/км</span>
+        <div class="paces" id="paces"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="progress">
+    <div class="progress-row"><span id="progText">Выполнено 0 из 0 тренировок</span><span id="kmText"></span></div>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-today" aria-selected="true" data-view="today"><span class="ic" aria-hidden="true">☀️</span>Сегодня</button>
+    <button class="tab" role="tab" id="tab-plan" aria-selected="false" data-view="plan"><span class="ic" aria-hidden="true">🗓️</span>План</button>
+    <button class="tab" role="tab" id="tab-log" aria-selected="false" data-view="log"><span class="ic" aria-hidden="true">📝</span>Журнал</button>
+  </nav>
+
+  <section id="view-today"></section>
+
+  <section id="view-plan" hidden>
+    <div class="weeks" id="weeks"></div>
+  </section>
+
+  <section id="view-log" hidden>
+    <div class="card shot" id="shotCard" hidden>
+      <div>
+        <div class="label">Без ручного ввода</div>
+        <h3>Скриншот пробежки</h3>
+        <div class="hint">Сделай скриншот итогов в Strava, Nike Run Club или другом беговом приложении. Можно 2–3 экрана: итоги и отрезки. Я распознаю дистанцию, время, темп по километрам, паузы и пульс и заполню форму ниже.</div>
+      </div>
+      <label class="btn" for="shotInput" id="shotLabel">📷 Загрузить скриншот</label>
+      <input type="file" id="shotInput" accept="image/png,image/jpeg,image/webp,image/gif" multiple class="vh">
+      <div class="hint" id="shotStatus" aria-live="polite"></div>
+    </div>
+    <form class="card log-form" id="logForm">
+      <label class="field"><span class="label">Дата</span><input type="date" id="logDate" required></label>
+      <label class="field"><span class="label">Дистанция, км</span><input type="number" id="logKm" step="0.01" min="0.1" max="100" required placeholder="10"></label>
+      <label class="field"><span class="label">Время</span><input type="text" id="logTime" placeholder="58:30" inputmode="numeric" required></label>
+      <label class="field"><span class="label">Самочувствие</span>
+        <select id="logFeel">
+          <option value="5">Отлично</option><option value="4" selected>Хорошо</option><option value="3">Нормально</option>
+          <option value="2">Тяжело</option><option value="1">Очень тяжело</option>
+        </select></label>
+      <label class="field wide"><span class="label">Заметка</span><input type="text" id="logNote" maxlength="200" placeholder="Пульс, погода, обувь, как ощущались ноги"></label>
+      <div class="form-foot">
+        <button class="btn" type="submit">Добавить пробежку</button>
+        <span class="hint" id="logHint">Время в формате мм:сс или ч:мм:сс</span>
+      </div>
+    </form>
+    <div class="stats" id="stats"></div>
+    <div class="table-wrap" id="logTable"></div>
+    <div class="card backup">
+      <div><div class="label">Данные хранятся на этом телефоне</div>
+        <h3>Резервная копия</h3>
+        <div class="hint">Раз в неделю сохраняй копию в «Файлы». Если сменишь телефон или очистишь Safari, восстановишь всё из неё.</div></div>
+      <div class="row">
+        <button class="btn" type="button" id="bkSave">Сохранить копию</button>
+        <label class="ghost" for="bkFile">Восстановить из копии</label>
+        <input type="file" id="bkFile" accept=".json,application/json" class="vh">
+      </div>
+      <div class="hint" id="bkStatus" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <div class="status" id="status">Данные хранятся на этом телефоне</div>
+</div>
+
+<div class="sheet-bg" id="sheet" hidden></div>
+<div class="coach" id="coach" hidden aria-live="polite">
+  <div class="coach-in">
+    <div class="coach-top"><span class="coach-phase" id="cPhase">Приготовься</span><span class="hint" id="cCount"></span></div>
+    <div><div class="coach-name" id="cName"></div><div class="coach-set" id="cSet"></div></div>
+    <div class="coach-tip" id="cTip"></div>
+    <div class="coach-time" id="cTime">0:10</div>
+    <div class="coach-bar"><i id="cBar"></i></div>
+    <button class="btn coach-done" id="cDone" type="button" hidden>Готово ✓</button>
+    <div class="coach-ctrl">
+      <button class="ghost" id="cPause" type="button">⏸ Пауза</button>
+      <button class="ghost" id="cSkip" type="button">⏭ Пропустить</button>
+      <button class="ghost" id="cMute" type="button">🔊 Звук вкл.</button>
+      <button class="ghost" id="cInfo" type="button">ⓘ Техника</button>
+      <button class="ghost" id="cSound" type="button">⚙ Звук</button>
+      <button class="ghost" id="cExit" type="button">✕ Завершить</button>
+    </div>
+  </div>
+</div>
+<div class="timerbar" id="timerbar" hidden role="timer" aria-live="polite">
+  <i class="tprog" id="tProg"></i>
+  <b id="tTime">0:00</b>
+  <span class="tlabel" id="tLabel">Отдых</span>
+  <button id="tPlus" type="button">+15 с</button>
+  <button id="tSkip" type="button">Пропустить</button>
+</div>
+
+<script>
+(() => {
+  const WEEKS = 18;
+  const DAY_NAMES = ["пн","вт","ср","чт","пт","сб","вс"];
+  const MONTHS = ["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"];
+  const PHASES = ["Втягивание","Втягивание","Втягивание · восстановление","Развитие","Развитие","Развитие · восстановление","Развитие","Развитие","Развитие · восстановление","Пик","Пик","Пик · восстановление","Пик","Пик","Пик · восстановление","Подводка","Подводка","Неделя старта"];
+  const RECOVERY = [3,6,9,12,15];
+
+  const LONG = [28,30,24,30,32,24,32,34,26,34,30,24,35,32,26,24,18,42.2];
+  const MID  = [16,18,14,18,20,15,20,22,16,22,20,16,22,20,16,14,12,8];
+  const TUE  = [8,10,8,10,10,8,10,12,8,12,10,8,12,10,8,8,6,6];
+  const MID_DESC = [
+    "Ровно в лёгком темпе. Втягиваемся в две длительные в неделю.",
+    "Последние 4 км в марафонском темпе.",
+    "Легко. Восстановительная неделя.",
+    "6 км в марафонском темпе в середине пробежки.",
+    "8 км в марафонском темпе в середине пробежки.",
+    "Легко. Восстановительная неделя.",
+    "10 км в марафонском темпе.",
+    "3 × 4 км в марафонском темпе, между ними 1 км легко.",
+    "Легко. Восстановительная неделя.",
+    "12 км в марафонском темпе. Пей на ходу, как на гонке.",
+    "Легко: в воскресенье длительная с марафонским темпом.",
+    "Легко. Восстановительная неделя.",
+    "12 км в марафонском темпе.",
+    "Легко: в воскресенье 20 км в марафонском темпе.",
+    "8 км в марафонском темпе.",
+    "8 км в марафонском темпе.",
+    "6 км в марафонском темпе.",
+    "Разминка 2 км, 4 км в марафонском темпе, заминка. Последняя работа."
+  ];
+  const MID_MP = [2,4,5,7,8,10,13,15,16,17,18];
+  const FRI = [
+    [10,"Темповая","Разминка 2 км, 5 км в темповом темпе, заминка.","tempo"],
+    [10,"Интервалы","Разминка 2 км, 6 × 1 км, отдых 400 м трусцой, заминка.","interval"],
+    [8,"Фартлек","Разминка 2 км, 8 × (1 мин быстро / 1 мин легко). Восстановительная неделя.","tempo"],
+    [12,"Темповая","Разминка 2 км, 2 × 4 км в темповом темпе, отдых 3 мин, заминка.","tempo"],
+    [12,"Интервалы","Разминка 2 км, 5 × 1,6 км, отдых 600 м трусцой, заминка.","interval"],
+    [8,"Лёгкий + ускорения","Лёгкий бег, в конце 8 ускорений по 20 с.","easy"],
+    [12,"Темповая","Разминка 2 км, 8 км в темповом темпе, заминка.","tempo"],
+    [12,"Интервалы","Разминка 2 км, 4 × 2 км, отдых 3 мин трусцой, заминка.","interval"],
+    [8,"Лёгкий + ускорения","Лёгкий бег, в конце 8 ускорений по 20 с.","easy"],
+    [12,"Темповая","Разминка 2 км, 3 × 3 км в темповом темпе, отдых 2 мин, заминка.","tempo"],
+    [12,"Интервалы","Разминка 2 км, 8 × 800 м, отдых 400 м трусцой, заминка.","interval"],
+    [8,"Фартлек","Разминка 2 км, 8 × (1 мин быстро / 1 мин легко).","tempo"],
+    [12,"Темповая","Разминка 2 км, 2 × 5 км в темповом темпе, отдых 3 мин, заминка.","tempo"],
+    [12,"Интервалы","Разминка 2 км, 6 × 1 км, отдых 400 м трусцой, заминка.","interval"],
+    [10,"Темповая","Разминка 2 км, 6 км в темповом темпе, заминка.","tempo"],
+    [10,"Интервалы","Разминка 2 км, 5 × 1 км, отдых 400 м. Свежесть важнее скорости.","interval"],
+    [8,"Темповая","Разминка 2 км, 4 км в темповом темпе, заминка.","tempo"],
+    [4,"Разминочный бег","Очень легко, 3 ускорения по 15 с. Собери вещи на старт.","easy"]
+  ];
+  const LONG_NOTE = {
+    1: "Легко и ровно. Гель или вода каждые 40–45 мин.",
+    5: "Последние 5 км в марафонском темпе.",
+    8: "Ровно, тренируй питание как на гонке.",
+    10: "Самая длинная по времени. Легко, гели каждые 40 мин.",
+    11: "С 10-го по 26-й км в марафонском темпе.",
+    13: "Генеральная репетиция: стартовая обувь, форма, питание.",
+    14: "20 км в марафонском темпе в середине пробежки."
+  };
+  const STR = { 0: "Тяга А · широкий хват", 1: "Толчок А · грудь/трицепс", 3: "Тяга В · нейтральный хват", 4: "Толчок В · объём", 5: "Гибкость и осанка" };
+  // Упражнения: n — название, sets, reps, rest — отдых в секундах, hold — удержание в секундах, legs — нагружает стопу/голень (убирается в перерыве)
+  const EX = {
+    0: [
+      { n: "Подтягивания широким хватом", sets: 4, reps: "6–10", rest: 180, tip: "Грудь к перекладине, не подбородок" },
+      { n: "Подтягивания обратным хватом", sets: 3, reps: "6–8", rest: 150, tip: "Чин-ап: бицепс + широчайшая" },
+      { n: "Австралийские подтягивания", sets: 3, reps: "10–12", rest: 90, tip: "Ноги прямые для усложнения" },
+      { n: "Подъём прямых ног выше 90°", sets: 3, reps: "8–10", rest: 60, tip: "1 сек пауза наверху" }
+    ],
+    1: [
+      { n: "Отжимания с ногами на возвышении", sets: 4, reps: "8–12", rest: 90, tip: "Акцент верх груди и плечи" },
+      { n: "Темповые отжимания (3-1-1)", sets: 3, reps: "8–10", rest: 90, tip: "Медленно вниз, пауза, взрыв" },
+      { n: "Отжимания с хлопком", sets: 3, reps: "6–8", rest: 90, tip: "Взрывная сила" },
+      { n: "Toes to bar", sets: 3, reps: "6–8", rest: 90, tip: "Ноги к перекладине, контроль" },
+      { n: "Болгарские выпады", sets: 3, reps: "8–10 / ногу", rest: 75, tip: "Задняя нога на стуле или диване, колено передней не заваливается внутрь" },
+      { n: "Подъёмы на носки", sets: 3, reps: "15", rest: 45, tip: "На ступеньке, медленно вниз, пауза 1 сек наверху: бережёт ахилл", legs: true },
+      { n: "Планка на локтях", sets: 3, reps: "45–60 сек", rest: 45, tip: "Тело в линию, ягодицы и пресс напряжены, поясница не провисает", hold: 60 }
+    ],
+    3: [
+      { n: "Подтягивания нейтральным хватом", sets: 4, reps: "6–10", rest: 180, tip: "Брахиалис + широчайшая" },
+      { n: "Подтягивания узким хватом", sets: 3, reps: "6–8", rest: 150, tip: "Нижняя часть широчайшей" },
+      { n: "L-sit в висе", sets: 3, reps: "10–15 сек", rest: 90, tip: "Ноги параллельно полу", hold: 15 },
+      { n: "Косые подъёмы коленей", sets: 3, reps: "8 / сторону", rest: 60, tip: "Колени к противоположному плечу" }
+    ],
+    4: [
+      { n: "Archer push-up", sets: 3, reps: "5–6 / руку", rest: 120, tip: "Одна рука вытянута в сторону" },
+      { n: "Классические отжимания", sets: 3, reps: "12–15", rest: 60, tip: "Объёмный подход" },
+      { n: "Отжимания на кулаках с паузой", sets: 3, reps: "8–10", rest: 90, tip: "2 сек в нижней точке" },
+      { n: "Windshield wiper", sets: 3, reps: "4–5 / сторону", rest: 90, tip: "Ноги горизонтально, поворот" },
+      { n: "Боковая планка", sets: 3, reps: "30–45 сек / сторону", rest: 30, tip: "Локоть под плечом, таз не опускается, тело в одну линию", hold: 45 }
+    ],
+    5: [
+      { n: "Задняя поверхность бедра", sets: 1, reps: "20 мин", rest: 0, tip: "Твоя программа с YouTube. Плавно, без рывков, дыши.", hold: 1200, video: "ham" },
+      { n: "Общая гибкость", sets: 1, reps: "15 мин", rest: 0, tip: "Твоя программа с YouTube. После длительной в воскресенье особенно полезно.", hold: 900, video: "flex" }
+    ],
+    // ---- Замены бега на время перерыва: гиря 16 кг, гантели 1–2 кг, груша. Без прыжков и подскоков, стопа плоско ----
+    box: [
+      { n: "Бой с тенью с гантелями 1–2 кг", sets: 2, reps: "2 мин", rest: 30, hold: 120, tip: "Разминка. Стопы плоско, без подскоков, руки у подбородка" },
+      { n: "Груша, ровный темп", sets: 8, reps: "3 мин", rest: 60, hold: 180, prep: 45, gloves: true, tip: "Зона 2: можешь говорить фразами. Серии по 2–4 удара, работа корпусом и тазом, ноги на месте" },
+      { n: "Махи гирей 16 кг", sets: 3, reps: "15", rest: 60, tip: "Толчок тазом, гиря до уровня груди, пятки на полу" },
+      { n: "Мёртвый жук", sets: 3, reps: "10 / сторону", rest: 45, tip: "Поясница прижата к полу, медленно" }
+    ],
+    kb: [
+      { n: "Становая тяга с гирей 16 кг", sets: 4, reps: "12", rest: 90, tip: "Таз назад, спина нейтральная, вес на всю стопу" },
+      { n: "Махи гирей двумя руками", sets: 5, reps: "15", rest: 60, tip: "Взрыв тазом, руки только держат гирю" },
+      { n: "Тяга гири в наклоне с опорой", sets: 4, reps: "10 / руку", rest: 60, tip: "Колено и рука на скамье или диване: стопа почти не нагружена" },
+      { n: "Жим гири одной рукой", sets: 4, reps: "6–8 / руку", rest: 90, tip: "Можно сидя, если стоять неприятно. Пресс и ягодицы напряжены" },
+      { n: "Ягодичный мост на одной ноге", sets: 3, reps: "12 / ногу", rest: 45, tip: "Опора на пятку. Если отдаёт в голень или ахилл, делай на двух ногах с гирей на тазу" },
+      { n: "Турецкий подъём", sets: 3, reps: "2 / сторону", rest: 90, tip: "Начни с маленькой гири, техника важнее веса" }
+    ],
+    int: [
+      { n: "Бой с тенью с гантелями", sets: 2, reps: "2 мин", rest: 30, hold: 120, tip: "Разминка, постепенно ускоряйся" },
+      { n: "Груша: 30 с максимально", sets: 10, reps: "30 с", rest: 30, hold: 30, prep: 45, gloves: true, tip: "Максимум ударов, ноги на месте. В отдых — лёгкая работа руками" },
+      { n: "Махи гирей 16 кг", sets: 6, reps: "20", rest: 40, tip: "Быстрый темп: это замена беговым интервалам" },
+      { n: "Груша, заминка", sets: 2, reps: "3 мин", rest: 30, hold: 180, prep: 45, gloves: true, tip: "Совсем легко, восстанавливай дыхание" }
+    ],
+    lng: [
+      { n: "Груша, ровный темп · блок 1", sets: 6, reps: "3 мин", rest: 60, hold: 180, prep: 45, gloves: true, tip: "На улице. Зона 2, ровно, без подскоков" },
+      { n: "Круг с гирей", sets: 4, reps: "10 махов + 5 тяг/руку + 5 жимов/руку", rest: 90, prep: 30, tip: "На улице, перчатки сними. Без пауз внутри круга, пульс в аэробной зоне" },
+      { n: "Груша, ровный темп · блок 2", sets: 6, reps: "3 мин", rest: 60, hold: 180, prep: 45, gloves: true, tip: "На улице. Тот же темп, что в первом блоке" },
+      { n: "Бой с тенью с гантелями", sets: 2, reps: "3 мин", rest: 30, hold: 180, prep: 60, tip: "Дома. Заминка, легко" }
+    ]
+  };
+  const CROSS = {
+    1: { title: "Бокс · аэробный", ex: "box", desc: "Около 45 минут. Держит аэробную базу вместо лёгкого бега." },
+    2: { title: "Гиря · сила", ex: "kb", desc: "Задняя цепь, спина и кор. Стопа и голень почти не нагружены." },
+    4: { title: "Бокс · интервалы", ex: "int", desc: "Около 35 минут. Замена беговой интенсивности." },
+    6: { title: "Длинная кардио-сессия", ex: "lng", desc: "70–80 минут: на улице груша, круг с гирей и снова груша, дома бой с тенью. Замена длительной." }
+  };
+  const setsFor = (w, n) => n <= 1 ? n : w === 18 ? 2 : w >= 16 ? Math.max(2, n - 1) : n;
+  const fmtHold = s => s >= 60 ? Math.round(s / 60) + " мин" : s + " с";
+
+  function gym(w, d) {
+    if (w === 18 && (d === 3 || d === 4)) return null;
+    let desc = d === 5 ? "Твоя программа с YouTube, 35–40 минут." : "Верх тела и кор, ногам не мешает.";
+    if (d === 1 || d === 4) desc = "Бег утром, зал вечером. Или сразу после бега, не до него.";
+    if (w >= 16 && d !== 5) desc = "Облегчённо: на подход меньше, без отказа.";
+    if (w === 18) desc = d === 5 ? "Лёгкая растяжка 15 минут." : "Совсем легко, половина объёма.";
+    return { type: "gym", title: STR[d], desc, ex: d, wk: w };
+  }
+
+  function buildWeek(w) {
+    const i = w - 1, recovery = RECOVERY.includes(w);
+    const days = [[], [], [], [], [], [], []];
+    days[1].push({ type: "easy", title: "Лёгкий бег", km: TUE[i], desc: recovery ? "Совсем легко, восстанавливаемся." : "Разговорный темп. Восстановление после воскресной длительной.", pace: "easy" });
+    days[2].push({ type: MID_MP.includes(w) ? "quality" : "long", title: "Средняя длительная", km: MID[i], desc: MID_DESC[i], pace: "long", pace2: MID_MP.includes(w) ? "mp" : null });
+    days[4].push({ type: FRI[i][3] === "easy" ? "easy" : "quality", title: FRI[i][1], km: FRI[i][0], desc: FRI[i][2], pace: FRI[i][3] });
+    days[6].push(w === 18
+      ? { type: "race", title: "Старт марафона", km: 42.2, desc: "Первая половина на 5–10 с/км медленнее целевого темпа. Пей на каждом пункте.", pace: "mp" }
+      : { type: "long", title: "Длительная", km: LONG[i], desc: LONG_NOTE[w] || (recovery ? "Восстановительная неделя, длительная короче." : "Легко и ровно, гели каждые 40–45 мин."), pace: "long", pace2: [5,11,14].includes(w) ? "mp" : null });
+    [0, 1, 3, 4, 5].forEach(d => { const g = gym(w, d); if (g) days[d].push(g); });
+    return days;
+  }
+  const PLAN = Array.from({ length: WEEKS }, (_, i) => buildWeek(i + 1));
+  const isRun = s => s.type !== "gym" && s.type !== "cross";
+  const skey = (w, d, j) => "w" + w + "d" + d + (j ? "s" + j : "");
+
+  // ---- Состояние ----
+  const KEY = "marathon-plan-v1";
+  let state = { race: "2027-03-07", goal: "4:15:00", done: {}, log: [], sets: {}, breaks: [] };
+  // Перенесено из старого Gump 18.11.2026: отметки недель 1–3 и журнал; перерыв с 18 ноября
+  const SEED = {
+    breaks: [{ from: "2026-11-18" }],
+    done: { w0d0: true, w0d1: true, w0d1s1: true, w0d2: true, w0d3: true, w0d4: true, w0d4s1: true, w0d5: true, w0d6: true,
+      w1d0: true, w1d1: true, w1d1s1: true, w1d2: true, w1d3: true, w1d4: true, w1d4s1: true, w1d5: true, w2d0: true, w2d1: true },
+    log: [
+      { id: "m09", date: "2026-11-17", km: 9.36, sec: 3801, feel: 4, note: "" },
+      { id: "m08", date: "2026-11-13", km: 10.08, sec: 3481, feel: 3, note: "" },
+      { id: "m07", date: "2026-11-11", km: 15.51, sec: 6078, feel: 2, note: "" },
+      { id: "m06", date: "2026-11-10", km: 13.18, sec: 4903, feel: 5, note: "" },
+      { id: "m05", date: "2026-11-08", km: 26.5, sec: 9883, feel: 4, note: "" },
+      { id: "m04", date: "2026-11-06", km: 13, sec: 4506, feel: 3, note: "" },
+      { id: "m03", date: "2026-11-04", km: 15, sec: 5065, feel: 4, note: "" },
+      { id: "m02", date: "2026-11-03", km: 9.6, sec: 3781, feel: 4, note: "" },
+      { id: "m01", date: "2026-11-01", km: 23, sec: 6481, feel: 5, note: "" }
+    ]
+  };
+  let stored = null;
+  try { stored = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+  state = Object.assign(state, stored || SEED);
+  if (!Array.isArray(state.breaks)) state.breaks = [];
+
+  let ref = null, writing = Promise.resolve(), saveTimer = null;
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    if (!ref) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      const body = JSON.parse(JSON.stringify(state));
+      writing = writing.then(() => ref.set(body)).then(
+        () => setStatus("Синхронизировано с аккаунтом"),
+        () => setStatus("Не удалось синхронизировать, данные сохранены в браузере"));
+    }, 400);
+  }
+  const $ = id => document.getElementById(id);
+  const setStatus = t => { $("status").textContent = t; };
+
+  // ---- Даты и темпы ----
+  function iso(d) { return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+  function parseISO(s) { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); }
+  function dayDate(w, d) { const r = parseISO(state.race); r.setDate(r.getDate() - 6 - (WEEKS - 1 - w) * 7 + d); return r; }
+  const fmtDay = d => d.getDate() + " " + MONTHS[d.getMonth()];
+  const today0 = () => { const t = new Date(); t.setHours(0,0,0,0); return t; };
+  function parseTime(s) {
+    const p = String(s).trim().split(":").map(Number);
+    if (p.some(isNaN) || p.length < 2 || p.length > 3) return null;
+    const sec = p.length === 3 ? p[0]*3600 + p[1]*60 + p[2] : p[0]*60 + p[1];
+    return sec > 0 ? sec : null;
+  }
+  function fmtTime(sec) {
+    sec = Math.round(sec); const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
+    return (h ? h + ":" + String(m).padStart(2,"0") : m) + ":" + String(s).padStart(2,"0");
+  }
+  const fmtPace = sec => Math.floor(sec/60) + ":" + String(Math.round(sec%60)).padStart(2,"0");
+  function paces() {
+    const g = parseTime(state.goal) || parseTime("4:15:00"), mp = g / 42.195;
+    return { easy: [mp+50, mp+80], long: [mp+35, mp+60], mp: [mp, mp], tempo: [mp-22, mp-12], interval: [mp-40, mp-30] };
+  }
+  const PACE_NAMES = { easy: "Лёгкий", long: "Длительная", mp: "Марафонский", tempo: "Темповой", interval: "Интервалы" };
+  const PACE_COLORS = { easy: "--easy", long: "--long", mp: "--race", tempo: "--quality", interval: "--quality" };
+  const paceStr = ([a,b]) => a === b ? fmtPace(a) : fmtPace(a) + "–" + fmtPace(b);
+  const kmStr = km => String(km).replace(".", ",");
+
+  // ---- Перерыв в беге ----
+  const activeBreak = () => state.breaks.find(b => !b.to);
+  function inBreak(date) { const s = iso(date); return state.breaks.some(b => s >= b.from && (!b.to || s <= b.to)); }
+  function afterBreak(date) {
+    const s = iso(date);
+    return state.breaks.some(b => b.to && s > b.to && (date - parseISO(b.to)) / 864e5 <= 7);
+  }
+  function crossFor(w, d, s) {
+    const c = CROSS[d]; if (!c) return null;
+    return { type: "cross", title: c.title, desc: c.desc + ` Вместо: ${s.title}${s.km ? " " + kmStr(s.km) + " км" : ""}.`, ex: c.ex, wk: w + 1 };
+  }
+  // Список тренировок дня с учётом перерыва: бег → замена, у силовых — без упражнений на стопу
+  function effList(w, d) {
+    const brk = inBreak(dayDate(w, d));
+    return PLAN[w][d].map((s, j) => {
+      if (!brk) return { s, key: skey(w, d, j) };
+      if (isRun(s)) { const c = crossFor(w, d, s); return c ? { s: c, key: skey(w, d, j) + "x" } : { s, key: skey(w, d, j) }; }
+      return { s: Object.assign({}, s, { brk: true }), key: skey(w, d, j) };
+    });
+  }
+  const exFor = s => EX[s.ex].map((e, i) => ({ e, i })).filter(x => !(s.brk && x.e.legs));
+
+  // ---- Рендер ----
+  function todayIdx() {
+    const t = today0(), diff = Math.round((t - dayDate(0, 0)) / 864e5);
+    return diff < 0 || diff >= WEEKS*7 ? null : { w: Math.floor(diff/7), d: diff % 7 };
+  }
+
+  function renderHeader() {
+    const t = today0();
+    const left = Math.round((parseISO(state.race) - t) / 864e5);
+    $("daysLeft").textContent = left >= 0 ? left : "Финиш";
+    const n = Math.abs(left) % 100, n1 = n % 10;
+    $("daysWord").textContent = left < 0 ? "забег позади" : (n > 10 && n < 20) ? "дней" : n1 === 1 ? "день" : (n1 >= 2 && n1 <= 4) ? "дня" : "дней";
+    $("bibLabel").textContent = activeBreak() ? "Перерыв в беге · бокс и гиря вместо пробежек" : "4 пробежки + 5 силовых в неделю";
+    const p = paces();
+    $("paces").innerHTML = Object.keys(PACE_NAMES).map(k =>
+      `<span><i class="dot" style="background:var(${PACE_COLORS[k]})"></i>${PACE_NAMES[k]} <b>${paceStr(p[k])}</b></span>`).join("");
+    let total = 0, done = 0, kmPlan = 0, kmDone = 0, gTotal = 0, gDone = 0, cTotal = 0, cDone = 0;
+    PLAN.forEach((days, w) => days.forEach((_, d) => effList(w, d).forEach(({ s, key }) => {
+      const ok = !!state.done[key];
+      if (s.type === "cross") { cTotal++; if (ok) cDone++; return; }
+      if (!isRun(s)) { gTotal++; if (ok) gDone++; return; }
+      if (ok) { done++; kmDone += s.km || 0; }
+    })));
+    PLAN.forEach(days => days.forEach(list => list.forEach(s => { if (isRun(s)) { total++; kmPlan += s.km || 0; } })));
+    $("progText").textContent = `Пробежки: ${done} из ${total} · силовые: ${gDone} из ${gTotal}` + (cTotal ? ` · замены: ${cDone}` : "");
+    $("kmText").textContent = `${Math.round(kmDone)} из ${Math.round(kmPlan)} км по плану`;
+    $("progBar").style.width = (total ? done/total*100 : 0) + "%";
+  }
+
+  function paceLine(s, p) {
+    return s.pace ? `${PACE_NAMES[s.pace]} темп: ${paceStr(p[s.pace])} /км` + (s.pace2 ? ` · марафонский ${paceStr(p[s.pace2])}` : "") : "";
+  }
+
+  function renderWeeks() {
+    const p = paces(), today = todayIdx();
+    const openSet = new Set([...document.querySelectorAll("details.week[open]")].map(el => +el.dataset.w));
+    const first = !$("weeks").children.length;
+    $("weeks").innerHTML = PLAN.map((days, w) => {
+      const eff = days.map((_, d) => effList(w, d)), all = eff.flat();
+      const runs = all.filter(x => isRun(x.s));
+      const km = runs.reduce((a, x) => a + (x.s.km || 0), 0);
+      const doneRuns = runs.filter(x => state.done[x.key]).length;
+      const hasBrk = all.some(x => x.s.type === "cross");
+      const isCur = today && today.w === w;
+      const open = first ? isCur || (!today && w === 0) : openSet.has(w);
+      const rows = eff.map((list, d) => {
+        const date = dayDate(w, d);
+        const cls = ["day", list.length ? "" : "rest", today && today.w === w && today.d === d ? "today" : ""].join(" ");
+        const dateHtml = `<div class="d-date"><b>${DAY_NAMES[d]}</b>${fmtDay(date)}</div>`;
+        if (!list.length) return `<div class="${cls}">${dateHtml}<div class="d-body">Отдых</div></div>`;
+        const sess = list.map(({ s, key }) => {
+          const isDone = !!state.done[key];
+          const pace = paceLine(s, p);
+          return `<div class="sess ${s.type}${isDone ? " is-done" : ""}">
+            <div class="d-body">
+              <div class="d-title">${s.title}${s.km ? `<span class="km">${kmStr(s.km)} км</span>` : ""}</div>
+              <div class="d-desc">${s.desc}</div>
+              ${s.ex != null ? `<div class="d-desc">${exFor(s).map(x => x.e.n).join(" · ")}</div>` : ""}
+              ${pace ? `<div class="d-pace">${pace}</div>` : ""}
+            </div>
+            <div class="d-actions">
+              ${s.km ? `<button class="ghost" data-log="${key}" title="Записать в журнал">В журнал</button>` : `<button class="ghost" data-open="${iso(date)}">Открыть</button>`}
+              <button class="check" aria-pressed="${isDone}" aria-label="Отметить выполненной: ${s.title}, ${fmtDay(date)}" data-key="${key}">✓</button>
+            </div></div>`;
+        }).join("");
+        return `<div class="${cls}">${dateHtml}<div class="sessions">${sess}</div></div>`;
+      }).join("");
+      return `<details class="week${isCur ? " current" : ""}" data-w="${w}"${open ? " open" : ""}>
+        <summary>
+          <div class="wk-no">${w+1}</div>
+          <div class="wk-meta"><h3>${fmtDay(dayDate(w,0))} – ${fmtDay(dayDate(w,6))}${isCur ? '<span class="chip">Сейчас</span>' : ""}${runs.length && doneRuns === runs.length ? '<span class="chip done">Готово</span>' : ""}${hasBrk ? '<span class="chip brk">Перерыв</span>' : ""}</h3>
+            <div>${PHASES[w]}</div></div>
+          <div class="wk-side"><b>${kmStr(Math.round(km*10)/10)} км</b><br>${doneRuns}/${runs.length} пробежек</div>
+        </summary>
+        <div class="days">${rows}</div>
+      </details>`;
+    }).join("");
+  }
+
+  const FEEL = { 5: "Отлично", 4: "Хорошо", 3: "Нормально", 2: "Тяжело", 1: "Очень тяжело" };
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" })[c]); }
+  function extraLine(r) {
+    const bits = [r.hr ? "пульс " + r.hr : "", r.pauseSec ? "паузы " + fmtTime(r.pauseSec) : "", r.elev ? "набор " + r.elev + " м" : ""].filter(Boolean).join(" · ");
+    const sp = Array.isArray(r.splits) && r.splits.length ? `<div class="splits">${r.splits.map((p, i) => `<span>${i + 1} км ${esc(p)}</span>`).join("")}</div>` : "";
+    return (bits ? `<div class="hint">${bits}</div>` : "") + sp;
+  }
+  function renderLog() {
+    const log = [...state.log].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+    const t = today0();
+    const mon = new Date(t); mon.setDate(t.getDate() - (t.getDay() + 6) % 7);
+    const d28 = new Date(t); d28.setDate(t.getDate() - 27);
+    const sum = arr => arr.reduce((a, r) => a + r.km, 0);
+    const week = log.filter(r => parseISO(r.date) >= mon), m = log.filter(r => parseISO(r.date) >= d28);
+    const totKm = sum(log), totSec = log.reduce((a, r) => a + r.sec, 0);
+    const longest = log.reduce((a, r) => Math.max(a, r.km), 0);
+    $("stats").innerHTML = [
+      ["Эта неделя", kmStr(Math.round(sum(week)*10)/10) + " км"],
+      ["За 4 недели", kmStr(Math.round(sum(m)*10)/10) + " км"],
+      ["Самая длинная", longest ? kmStr(longest) + " км" : "—"],
+      ["Средний темп", totKm ? fmtPace(totSec/totKm) : "—"]
+    ].map(([l, v]) => `<div class="stat"><span class="label">${l}</span><b class="num">${v}</b></div>`).join("");
+    if (!log.length) {
+      $("logTable").innerHTML = `<div class="empty">Здесь появятся твои пробежки: дистанция, время, темп и самочувствие.<br>Добавь первую через форму выше или кнопкой «В журнал» у тренировки в плане.</div>`;
+      return;
+    }
+    $("logTable").innerHTML = `<table><thead><tr><th>Дата</th><th class="r">Км</th><th class="r">Время</th><th class="r">Темп</th><th>Самочувствие</th><th>Заметка</th><th></th></tr></thead><tbody>${
+      log.map(r => `<tr><td class="num">${fmtDay(parseISO(r.date))}</td><td class="r mono">${kmStr(r.km)}</td><td class="r mono">${fmtTime(r.sec)}</td>
+        <td class="r mono">${fmtPace(r.sec / r.km)}</td><td class="feel">${FEEL[r.feel] || ""}</td><td>${esc(r.note || "")}${extraLine(r)}</td>
+        <td class="r"><button class="ghost" data-del="${r.id}" aria-label="Удалить запись">Удалить</button></td></tr>`).join("")
+    }</tbody></table>`;
+  }
+
+  function renderSettings() {
+    if (document.activeElement !== $("raceDate")) $("raceDate").value = state.race;
+    if (document.activeElement !== $("goalTime")) $("goalTime").value = state.goal;
+  }
+
+  // ---- Сегодня ----
+  let viewDate = today0();
+  let curToday = { list: [] };
+  const WD = ["воскресенье","понедельник","вторник","среда","четверг","пятница","суббота"];
+  function sessionsFor(date) {
+    const diff = Math.round((date - dayDate(0, 0)) / 864e5);
+    if (diff >= 0 && diff < WEEKS * 7) {
+      const w = Math.floor(diff / 7), d = diff % 7;
+      return { w, list: effList(w, d) };
+    }
+    const d = (date.getDay() + 6) % 7, g = STR[d] != null ? gym(0, d) : null;
+    return { w: null, before: diff < 0, list: g ? [{ s: g, key: "x" + iso(date) }] : [] };
+  }
+  function runCard(s, key, p) {
+    const done = !!state.done[key], pl = paceLine(s, p);
+    return `<div class="tcard ${s.type}">
+      <div class="tcard-head"><div><div class="label">${s.type === "race" ? "Старт" : "Бег"}</div><h3>${s.title}<span class="mono">${kmStr(s.km)} км</span></h3></div>
+        <button class="check" aria-pressed="${done}" data-key="${key}" aria-label="Отметить выполненной: ${s.title}">✓</button></div>
+      <div class="d-desc">${s.desc}</div>
+      ${pl ? `<div class="d-pace">${pl}</div>` : ""}
+      ${afterBreak(viewDate) ? `<div class="note"><b>Первая неделя после перерыва:</b> половина объёма, без интенсивности.</div>` : ""}
+      <div class="d-actions">${sampleFn ? `<button class="btn" data-shot="${iso(viewDate)}">📷 Скриншот пробежки</button>` : ""}<button class="ghost" data-log="${key}">Записать вручную</button></div>
+    </div>`;
+  }
+  const videoUrl = id => { const u = (state.videos || {})[id] || ""; return /^https:\/\//.test(u) ? u : ""; };
+  function gymCard(s, key) {
+    const done = !!state.done[key];
+    const exHtml = exFor(s).map(({ e, i }) => {
+      const n = setsFor(s.wk, e.sets), st = state.sets[key + ":" + i] || {}, d = st.d || [];
+      const cnt = Array.from({ length: n }, (_, k) => !!d[k]).filter(Boolean).length;
+      return `<div class="ex${cnt === n ? " complete" : ""}">
+        <button class="ex-name" type="button" data-info="${s.ex}|${i}">${e.n} <span class="i">i</span></button>
+        <div class="ex-meta">${n > 1 ? n + " × " : ""}${e.reps}${e.rest ? ` · отдых ${e.rest} с` : ""}</div>
+        <div class="ex-tip">${e.tip}</div>
+        <div class="sets">
+          ${Array.from({ length: n }, (_, k) => `<button class="set" aria-pressed="${!!d[k]}" data-set="${key}|${i}|${k}" aria-label="${e.n}, ${n > 1 ? "подход " + (k + 1) : "выполнено"}">${n > 1 ? k + 1 : "✓"}</button>`).join("")}
+          ${e.hold ? `<button class="ghost" data-hold="${e.hold}">⏱ ${fmtHold(e.hold)}</button>` : ""}
+          ${e.video
+            ? (videoUrl(e.video) ? `<a class="ghost" href="${esc(videoUrl(e.video))}" target="_blank" rel="noopener">▶ Видео</a>` : "")
+              + `<input class="ex-res" id="vid-${e.video}-${key}" data-vid="${e.video}" type="url" placeholder="Вставь ссылку на видео с YouTube" value="${esc(videoUrl(e.video))}">`
+            : `<input class="ex-res" id="res-${key}-${i}" data-res="${key}:${i}" placeholder="Результат: 10, 9, 8" value="${esc(st.r || "")}">`}
+        </div>
+      </div>`;
+    }).join("");
+    const cross = s.type === "cross";
+    return `<div class="tcard ${s.type}">
+      <div class="tcard-head"><div><div class="label">${cross ? "Вместо бега" : "Силовая"}${s.wk >= 16 ? " · облегчённо" : ""}</div><h3>${s.title}</h3></div>
+        <button class="check" aria-pressed="${done}" data-key="${key}" aria-label="Отметить выполненной: ${s.title}">✓</button></div>
+      <div class="d-actions"><button class="btn coach-btn" type="button" data-coach="${key}">🔊 Вести голосом</button><button class="ghost" type="button" data-sound>⚙ Звук</button></div>
+      <div class="d-desc">${s.desc} Отметь подход, и запустится таймер отдыха. Нажми на название упражнения — покажу технику.${s.brk && !cross && EX[s.ex].some(e => e.legs) ? " На время перерыва подъёмы на носки убраны." : ""}</div>
+      <div class="ex-list">${exHtml}</div>
+    </div>`;
+  }
+  function brkHtml() {
+    const b = activeBreak();
+    if (!b) return `<div class="brk-off"><button class="ghost" data-break="start">⏸ Взять перерыв в беге</button></div>`;
+    const n = Math.round((today0() - parseISO(b.from)) / 864e5) + 1;
+    return `<div class="brk">
+      <div><div class="label">Перерыв в беге · ${n > 0 ? "день " + n : "с " + fmtDay(parseISO(b.from))}</div>
+        <div class="d-desc">Пробежки заменены боксом и гирей, силовые идут как обычно. Дата старта не сдвигается.</div></div>
+      <div class="brk-row">
+        <label class="field"><span class="label">Начало</span><input type="date" data-brkfrom value="${b.from}"></label>
+        <button class="btn" data-break="end">▶ Возвращаюсь к бегу</button>
+      </div></div>`;
+  }
+  function renderToday() {
+    const box = $("view-today");
+    if (box.contains(document.activeElement) && document.activeElement.tagName === "INPUT") return;
+    const diff = Math.round((viewDate - today0()) / 864e5);
+    const rel = diff === 0 ? "сегодня, " : diff === 1 ? "завтра, " : diff === -1 ? "вчера, " : "";
+    const S = curToday = sessionsFor(viewDate), p = paces();
+    const sub = S.w != null ? `Неделя ${S.w + 1} из ${WEEKS} · ${PHASES[S.w]}`
+      : S.before ? `Беговой план стартует ${fmtDay(dayDate(0, 0))}. До этого — силовые по расписанию.` : "Беговой план завершён.";
+    const cards = S.list.map(({ s, key }) => s.ex != null ? gymCard(s, key) : runCard(s, key, p)).join("")
+      || `<div class="tcard"><div class="label">Без тренировок</div><h3>Отдых</h3>
+          <div class="d-desc">Сон, еда, прогулка. Если всё же побегал, запиши пробежку в журнал.</div>
+          <div><button class="ghost" data-logdate="${iso(viewDate)}">Записать пробежку</button></div></div>`;
+    box.innerHTML = `<div class="today-nav">
+        <button class="navbtn" data-nav="-1" aria-label="Предыдущий день">‹</button>
+        <h2>${rel}${WD[viewDate.getDay()]}, ${fmtDay(viewDate)}</h2>
+        ${diff ? '<button class="ghost" data-nav="0">К сегодня</button>' : ""}
+        <button class="navbtn" data-nav="1" aria-label="Следующий день">›</button>
+      </div>
+      <div class="today-sub">${sub}</div>
+      ${brkHtml()}
+      <div class="tcards">${cards}</div>`;
+  }
+  function toggleSet(btn) {
+    const [key, i, k] = btn.dataset.set.split("|"), id = key + ":" + i;
+    const item = curToday.list.find(x => x.key === key); if (!item) return;
+    const s = item.s, list = exFor(s);
+    const st = Object.assign({ d: [], r: "" }, state.sets[id]);
+    st.d = (st.d || []).slice(); st.d[+k] = !st.d[+k];
+    for (let x = 0; x < st.d.length; x++) st.d[x] = !!st.d[x];
+    state.sets[id] = st;
+    const complete = j => { const n = setsFor(s.wk, EX[s.ex][j].sets), dd = (state.sets[key + ":" + j] || {}).d || []; return Array.from({ length: n }, (_, q) => !!dd[q]).every(Boolean); };
+    const allDone = list.every(x => complete(x.i));
+    if (allDone) state.done[key] = true;
+    const e = EX[s.ex][+i];
+    if (st.d[+k] && !allDone && e.rest > 0) {
+      ensureAudio();
+      const n = setsFor(s.wk, e.sets), pos = list.findIndex(x => x.i === +i), nx = list[pos + 1];
+      const next = complete(+i) ? (nx ? "дальше: " + nx.e.n : "дальше: что осталось") : `${e.n}, подход ${Math.min(n, st.d.filter(Boolean).length + 1)} из ${n}`;
+      startTimer(e.rest, "Отдых · " + next);
+    }
+    save(); renderHeader(); renderWeeks(); renderToday();
+  }
+
+  // ---- Скриншот пробежки ----
+  let sampleFn = null, shotMax = 3, shotDate = null, pendingExtra = null, shotBusy = false;
+  const SHOT_ERR = {
+    not_granted: "Чтобы распознавать скриншоты, разреши приложению обращаться к Claude.",
+    rate_limited: "Слишком много запросов. Попробуй через пару минут.",
+    image_rejected: "Этот файл не подошёл. Нужен скриншот в PNG или JPG.",
+    invalid_json: "Не получилось разобрать ответ. Попробуй ещё раз.",
+    refused: "Не получилось распознать этот скриншот. Попробуй экран с итогами пробежки.",
+    session_expired: "Войди в claude.ai заново и попробуй ещё раз."
+  };
+  $("shotInput").addEventListener("change", async e => {
+    const files = [...e.target.files].slice(0, shotMax);
+    e.target.value = "";
+    if (!files.length || !sampleFn || shotBusy) return;
+    shotBusy = true;
+    showView("log");
+    const st = $("shotStatus"), today = iso(new Date());
+    st.textContent = "Распознаю скриншот… обычно 10–40 секунд.";
+    const prompt = `На ${files.length > 1 ? "скриншотах" : "скриншоте"} итоги пробежки из бегового приложения (Strava, Nike Run Club, Apple Fitness, Garmin и т. п.). Сегодня ${today}.
+Извлеки данные и ответь только одним JSON-объектом такого вида:
+{"date":"YYYY-MM-DD или null","km":12.34,"time":"ч:мм:сс — время в движении","elapsed":"ч:мм:сс — общее время с паузами, или null","splits":["5:41","5:38"],"pauseSec":95,"avgHr":148,"elevation":42,"title":"название тренировки или null"}
+splits — темп каждого километра по порядку в формате м:сс (пустой массив, если отрезков не видно). pauseSec — сумма пауз в секундах (null, если не видно). avgHr — средний пульс (null, если нет). elevation — набор высоты в метрах (null, если нет).
+Дату словами («Вчера», «Сегодня», «суббота») переведи в дату относительно сегодняшней. Мили переведи в километры, а темп на милю — в темп на километр.
+Если на изображении нет итогов пробежки, ответь {"error":"коротко, почему"}.`;
+    try {
+      const r = await sampleFn.json(prompt, { images: files });
+      if (!r || r.error || !(+r.km > 0)) {
+        st.textContent = r && r.error ? "Не получилось: " + String(r.error).slice(0, 160) : "Не нашёл на скриншоте дистанцию. Пришли экран с итогами пробежки.";
+        return;
+      }
+      $("logDate").value = /^\d{4}-\d\d-\d\d$/.test(r.date || "") ? r.date : (shotDate || today);
+      $("logKm").value = Math.round(+r.km * 100) / 100;
+      $("logTime").value = parseTime(r.time) ? String(r.time) : (parseTime(r.elapsed) ? String(r.elapsed) : "");
+      $("logNote").value = r.title ? String(r.title).slice(0, 120) : "";
+      const moving = parseTime(r.time), total = parseTime(r.elapsed);
+      pendingExtra = {
+        splits: Array.isArray(r.splits) ? r.splits.map(String).filter(x => parseTime(x)).slice(0, 60) : [],
+        pauseSec: +r.pauseSec > 0 ? Math.round(+r.pauseSec) : (moving && total && total > moving ? total - moving : 0),
+        hr: +r.avgHr > 0 ? Math.round(+r.avgHr) : 0,
+        elev: +r.elevation > 0 ? Math.round(+r.elevation) : 0
+      };
+      st.textContent = "Готово. Проверь цифры, выбери самочувствие и нажми «Добавить пробежку».";
+      $("logForm").scrollIntoView({ block: "center" });
+    } catch (err) {
+      const code = err && err.code;
+      if (code === "cancelled") { st.textContent = ""; return; }
+      st.textContent = SHOT_ERR[code] || "Не получилось распознать. Попробуй ещё раз.";
+      if (["not_granted", "sampling_disabled", "images_unavailable", "not_declared", "capability_disabled", "capability_removed"].includes(code)) {
+        sampleFn = null; renderToday();
+      }
+    } finally { shotDate = null; shotBusy = false; }
+  });
+
+  // ---- Таймер ----
+  let timer = null, actx = null;
+  function ensureAudio() {
+    try { applySession(); } catch (e) {}
+    try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume(); } catch (e) {}
+    try { decodeAll(); } catch (e) {}
+  }
+  function beep() {
+    if (!actx) return;
+    try {
+      [0, 0.28, 0.56].forEach(t => {
+        const o = actx.createOscillator(), g = actx.createGain(), at = actx.currentTime + t;
+        o.frequency.value = 880; g.gain.setValueAtTime(0.0001, at);
+        g.gain.exponentialRampToValueAtTime(0.35, at + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.2);
+        o.connect(g); g.connect(actx.destination); o.start(at); o.stop(at + 0.22);
+      });
+    } catch (e) {}
+  }
+  function startTimer(sec, label) {
+    timer = { end: Date.now() + sec * 1000, total: sec * 1000, label, hold: label === "Удержание" };
+    $("timerbar").hidden = false; tick();
+  }
+  function tick() {
+    if (!timer) return;
+    const left = timer.end - Date.now();
+    if (left <= 0) {
+      beep(); try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (e) {}
+      $("tTime").textContent = "0:00"; $("tProg").style.width = "100%";
+      $("tLabel").textContent = timer.hold ? "Готово!" : "Время! Следующий подход";
+      timer = null;
+      setTimeout(() => { if (!timer) $("timerbar").hidden = true; }, 4000);
+      return;
+    }
+    $("tTime").textContent = fmtPace(Math.ceil(left / 1000));
+    $("tLabel").textContent = timer.label;
+    $("tProg").style.width = (100 - left / timer.total * 100) + "%";
+  }
+  setInterval(tick, 250);
+  $("tPlus").addEventListener("click", () => { if (timer) { timer.end += 15000; timer.total += 15000; tick(); } });
+  $("tSkip").addEventListener("click", () => { timer = null; $("timerbar").hidden = true; });
+
+  // ======== Техника: схемы, подсказки, видео ========
+  const KEYMAP = {
+    "Подтягивания широким хватом": "pullWide", "Подтягивания обратным хватом": "pullRev", "Австралийские подтягивания": "aussie",
+    "Подъём прямых ног выше 90°": "legRaise", "Отжимания с ногами на возвышении": "pushDecline", "Темповые отжимания (3-1-1)": "pushTempo",
+    "Отжимания с хлопком": "pushClap", "Toes to bar": "t2b", "Болгарские выпады": "bulgarian", "Подъёмы на носки": "calf",
+    "Планка на локтях": "plank", "Подтягивания нейтральным хватом": "pullNeutral", "Подтягивания узким хватом": "pullNarrow",
+    "L-sit в висе": "lsit", "Косые подъёмы коленей": "oblique", "Archer push-up": "archer", "Классические отжимания": "push",
+    "Отжимания на кулаках с паузой": "pushFist", "Windshield wiper": "wiper", "Боковая планка": "sidePlank",
+    "Задняя поверхность бедра": "ham", "Общая гибкость": "flex",
+    "Бой с тенью с гантелями 1–2 кг": "shadow", "Бой с тенью с гантелями": "shadow",
+    "Груша, ровный темп": "bag", "Груша, ровный темп · блок 1": "bag", "Груша, ровный темп · блок 2": "bag", "Груша, заминка": "bag",
+    "Груша: 30 с максимально": "bagFast", "Махи гирей 16 кг": "swing", "Махи гирей двумя руками": "swing", "Мёртвый жук": "deadbug",
+    "Становая тяга с гирей 16 кг": "kbdl", "Тяга гири в наклоне с опорой": "kbrow", "Жим гири одной рукой": "kbpress",
+    "Ягодичный мост на одной ноге": "bridge", "Турецкий подъём": "tgu", "Круг с гирей": "circuit"
+  };
+  // Фигурка: hd голова, sh плечи, el/ha локоть/кисть, hp таз, kn/ft колено/стопа, to носок; *2 — дальняя сторона
+  const ST = { hd: [61,31], sh: [60,39], el: [60,52], ha: [60,64], hp: [58,64], kn: [58,84], ft: [58,104] };
+  const pz = (o, b = ST) => Object.assign({}, b, o);
+  const BAR = y => ["bar", 22, 98, y];
+  const pullP = sp => [
+    { hd: [60,35], sh: [60,44], el: [60 - sp*.8, 31], ha: [60 - sp, 18], el2: [60 + sp*.8, 31], ha2: [60 + sp, 18], hp: [60,68], kn: [58,84], ft: [58,100], kn2: [62,84], ft2: [62,100], props: [BAR(18)], nofloor: 1 },
+    { hd: [60,15], sh: [60,26], el: [60 - sp - 9, 30], ha: [60 - sp, 18], el2: [60 + sp + 9, 30], ha2: [60 + sp, 18], hp: [60,51], kn: [58,67], ft: [58,83], kn2: [62,67], ft2: [62,83], props: [BAR(18), ["arr", 108, 62, 108, 36]], nofloor: 1 }
+  ];
+  const HANG = { hd: [64,38], sh: [60,46], el: [60,32], ha: [60,18], hp: [60,70], kn: [60,86], ft: [60,102], props: [BAR(18)], nofloor: 1 };
+  const FRONT = pullP(14)[0];
+  const PUP = { hd: [88,72], sh: [80,76], el: [80,90], ha: [80,104], hp: [50,88], kn: [33,95], ft: [16,103] };
+  const PDN = { hd: [87,92], sh: [79,96], el: [70,92], ha: [80,104], hp: [49,99], kn: [32,101], ft: [16,104] };
+  const BENCH = (x, y, w, h) => ["bench", x, y, w, h];
+  const GUARD = { hd: [64,30], sh: [62,38], el: [70,48], ha: [70,34], el2: [66,50], ha2: [73,40], hp: [60,62], kn: [56,82], ft: [48,104], kn2: [68,82], ft2: [74,104] };
+  const JAB = pz({ el: [78,40], ha: [93,38] }, GUARD);
+  const BAGP = ["bag", 99, 8, 14, 72];
+  const SW_LO = { hd: [70,44], sh: [62,49], el: [58,62], ha: [52,76], hp: [44,66], kn: [58,84], ft: [56,104], props: [["kb", 51, 84]] };
+  const SW_HI = { hd: [62,31], sh: [60,39], el: [73,42], ha: [86,44], hp: [58,64], kn: [58,84], ft: [56,104], props: [["kb", 91, 50]] };
+  const ROWB = { hd: [94,58], sh: [86,62], el2: [86,72], ha2: [86,80], hp: [58,64], kn2: [58,80], ft2: [40,80], kn: [50,86], ft: [48,104] };
+  const ROW_DN = pz({ el: [83,76], ha: [83,90], props: [BENCH(36,80,62,24), ["kb", 83, 96]] }, ROWB);
+  const ROW_UP = pz({ el: [73,56], ha: [76,66], props: [BENCH(36,80,62,24), ["kb", 76, 73], ["arr", 104, 90, 104, 68]] }, ROWB);
+  const PR_LO = pz({ el: [68,50], ha: [66,40], props: [["kb", 69, 36]] });
+  const PR_HI = pz({ el: [62,25], ha: [62,11], props: [["kb", 63, 7]] });
+  const LIE = { hd: [20,95], sh: [28,98], hp: [54,98] };
+  const INFO = {
+    pullWide: { pos: pullP(22), tips: ["Хват шире плеч, начинай из полного виса.", "Тяни грудью к перекладине, локти ведут вниз и назад.", "Опускайся медленно, без рывков и раскачки."], yt: "подтягивания широким хватом техника" },
+    pullRev: { pos: pullP(10), tips: ["Ладони к себе, хват на ширине плеч.", "Подбородок выше перекладины, локти вдоль корпуса.", "Внизу полностью выпрямляй руки."], yt: "подтягивания обратным хватом техника" },
+    pullNeutral: { pos: pullP(12), tips: ["Ладони смотрят друг на друга (параллельные ручки).", "Лопатки сначала вниз, потом тяга.", "Вверху пауза, вниз 2 секунды."], yt: "подтягивания нейтральным хватом техника" },
+    pullNarrow: { pos: pullP(7), tips: ["Кисти близко, локти идут вперёд и вниз.", "Тянись грудью к рукам.", "Ноги вместе, корпус не раскачивай."], yt: "подтягивания узким хватом техника" },
+    aussie: { pos: [
+      { hd: [72,74], sh: [64,78], el: [65,64], ha: [66,50], hp: [42,88], kn: [29,96], ft: [15,104], props: [["bar", 54, 80, 50]] },
+      { hd: [70,51], sh: [62,56], el: [50,52], ha: [66,50], hp: [40,79], kn: [28,92], ft: [15,104], props: [["bar", 54, 80, 50], ["arr", 104, 86, 104, 60]] }
+    ], tips: ["Тело прямое от пяток до макушки, таз не провисает.", "Тяни грудь к перекладине, своди лопатки.", "Чем ниже перекладина, тем тяжелее."], yt: "австралийские подтягивания техника" },
+    legRaise: { pos: [HANG, pz({ hp: [58,70], kn: [73,61], ft: [88,52], props: [BAR(18), ["arr", 104, 96, 104, 62]] }, HANG)], tips: ["Ноги прямые, поднимай выше горизонтали.", "Без раскачки: вверх силой пресса.", "Пауза 1 секунда наверху, вниз медленно."], yt: "подъём прямых ног в висе техника" },
+    t2b: { pos: [HANG, pz({ hp: [57,68], kn: [74,52], ft: [72,26] }, HANG)], tips: ["Подкрути таз и тяни носки к перекладине.", "Руки прямые, лопатки активны.", "Опускай ноги под контролем, не бросай."], yt: "toes to bar техника" },
+    lsit: { pos: [HANG, pz({ kn: [77,70], ft: [94,70] }, HANG)], cap: ["Вис", "Удержание"], tips: ["Ноги прямые, параллельно полу.", "Носки на себя, пресс напряжён.", "Если тяжело — согни колени."], yt: "L-sit в висе на турнике" },
+    oblique: { pos: [FRONT, pz({ hp: [60,68], kn: [72,60], ft: [74,78], kn2: [70,64], ft2: [72,82] }, FRONT)], cap: ["Вис", "Колени в сторону"], tips: ["Колени к противоположному плечу.", "Без раскачки, работают косые мышцы.", "Чередуй стороны."], yt: "косые подъёмы коленей в висе" },
+    wiper: { pos: [pz({ kn: [77,70], ft: [94,70] }, HANG), pz({ hp: [60,68], kn: [76,62], ft: [92,56], kn2: [76,66], ft2: [92,60] }, FRONT)], cap: ["Ноги вверх", "Поворот в сторону"], tips: ["Подними ноги и вращай их как дворник.", "Плечи и руки неподвижны.", "Амплитуду увеличивай постепенно."], yt: "windshield wiper турник техника" },
+    push: { pos: [PUP, PDN], tips: ["Кисти под плечами, тело одной линией.", "Локти под углом около 45° к корпусу.", "Грудь почти касается пола."], yt: "классические отжимания техника" },
+    pushTempo: { pos: [PUP, PDN], cap: ["Старт", "3 с вниз · 1 с пауза · 1 с вверх"], tips: ["Вниз ровно 3 секунды.", "1 секунда пауза внизу, не ложись.", "Вверх взрывно, за 1 секунду."], yt: "темповые отжимания 3-1-1" },
+    pushFist: { pos: [PUP, PDN], cap: ["Старт", "Пауза 2 с"], tips: ["Опора на две первые костяшки, запястье прямое.", "Внизу пауза 2 секунды.", "Делай на мягком коврике."], yt: "отжимания на кулаках техника" },
+    pushClap: { pos: [PDN, { hd: [89,64], sh: [81,68], el: [90,78], ha: [94,72], el2: [88,80], ha2: [94,72], hp: [50,84], kn: [33,93], ft: [16,103] }], cap: ["Внизу", "Взрыв и хлопок"], tips: ["Толкай пол максимально резко.", "Хлопок быстро, руки сразу назад под плечи.", "Приземляйся на мягкие локти."], yt: "отжимания с хлопком техника" },
+    pushDecline: { pos: [
+      { hd: [90,72], sh: [82,77], el: [82,90], ha: [82,104], hp: [52,75], kn: [36,73], ft: [22,72], props: [BENCH(4,72,30,32)] },
+      { hd: [89,92], sh: [81,95], el: [72,90], ha: [82,104], hp: [52,84], kn: [36,78], ft: [22,72], props: [BENCH(4,72,30,32)] }
+    ], tips: ["Ноги на диване или стуле, тело прямое.", "Нагрузка уходит в верх груди и плечи.", "Таз не поднимай и не проваливай."], yt: "отжимания с ногами на возвышении техника" },
+    archer: { pos: [
+      { hd: [44,70], sh: [46,80], el: [40,92], ha: [38,104], el2: [70,90], ha2: [96,104], nolegs: 1 },
+      { hd: [76,70], sh: [74,80], el: [80,92], ha: [82,104], el2: [50,90], ha2: [24,104], nolegs: 1 }
+    ], cap: ["Влево", "Вправо"], tips: ["Руки очень широко.", "Опускайся к одной руке, вторая остаётся прямой.", "Чередуй стороны или делай по 5–6 на каждую."], yt: "archer push up техника" },
+    bulgarian: { pos: [
+      { hd: [63,32], sh: [62,40], el: [62,53], ha: [62,65], hp: [62,66], kn: [66,85], ft: [66,104], kn2: [50,82], ft2: [28,80], props: [BENCH(4,80,30,24)] },
+      { hd: [61,50], sh: [60,58], el: [60,71], ha: [60,83], hp: [58,82], kn: [74,88], ft: [70,104], kn2: [52,100], ft2: [28,80], props: [BENCH(4,80,30,24)] }
+    ], tips: ["Задняя нога на опоре, передняя стопа далеко вперёд.", "Колено передней ноги смотрит по носку.", "Опускайся вертикально вниз."], yt: "болгарские выпады техника" },
+    calf: { pos: [
+      { hd: [61,25], sh: [60,33], el: [60,46], ha: [60,58], hp: [58,58], kn: [58,78], ft: [56,98], to: [66,96], props: [["step", 60, 96, 40, 8]] },
+      { hd: [61,17], sh: [60,25], el: [60,38], ha: [60,50], hp: [58,50], kn: [58,70], ft: [58,88], to: [66,96], props: [["step", 60, 96, 40, 8]] }
+    ], cap: ["Пятка ниже ступеньки", "Наверх, пауза"], tips: ["Носок на краю ступеньки.", "Вниз медленно, ниже уровня ступеньки.", "Пауза наверху 1 секунда."], yt: "подъёмы на носки на ступеньке техника" },
+    plank: { pos: [{ hd: [88,84], sh: [80,88], el: [80,104], ha: [92,104], hp: [50,96], kn: [34,100], ft: [16,104] }], cap: ["Удержание"], tips: ["Локти под плечами.", "Ягодицы и пресс напряжены, поясница не провисает.", "Дыши ровно, не задерживай дыхание."], yt: "планка на локтях техника" },
+    sidePlank: { pos: [{ hd: [24,82], sh: [30,88], el: [30,104], ha: [42,104], el2: [42,86], ha2: [56,92], hp: [60,96], kn: [78,100], ft: [96,104] }], cap: ["Удержание"], tips: ["Локоть строго под плечом.", "Тело в одну линию, таз не опускается.", "Обе стороны одинаковое время."], yt: "боковая планка техника" },
+    ham: { pos: [
+      { hd: [40,68], sh: [40,76], el: [50,86], ha: [60,94], hp: [40,101], kn: [60,102], ft: [80,102] },
+      { hd: [70,88], sh: [62,88], el: [70,94], ha: [80,100], hp: [40,101], kn: [60,102], ft: [80,102] }
+    ], cap: ["Сидя ровно", "Наклон к носкам"], tips: ["Наклон от таза, спина длинная.", "Колени прямые, но не заблокированы.", "Без пружинящих рывков, дыши."], yt: "растяжка задней поверхности бедра" },
+    flex: { pos: [pz({ hd: [62,31], el: [60,26], ha: [60,12] }), { hd: [79,87], sh: [74,79], el: [74,92], ha: [72,102], hp: [57,62], kn: [58,83], ft: [58,104] }], cap: ["Вытяжение", "Наклон"], tips: ["Двигайся плавно, без боли.", "В каждой позиции 20–30 секунд.", "Выдох на углублении растяжки."], yt: "растяжка всего тела 15 минут" },
+    shadow: { pos: [pz({ props: [["db", 70, 34], ["db", 73, 40]] }, GUARD), pz({ props: [["db", 93, 38], ["db", 73, 40]] }, JAB)], cap: ["Стойка", "Джеб"], tips: ["Руки у подбородка, удар и сразу назад.", "Стопы стоят на полу, без подскоков.", "Дыши на каждом ударе."], yt: "бой с тенью с гантелями для начинающих" },
+    bag: { pos: [pz({ props: [BAGP] }, GUARD), pz({ props: [BAGP] }, JAB)], cap: ["Стойка", "Удар"], tips: ["Удар идёт от разворота таза и корпуса.", "Ноги на месте, вес на всей стопе — щадим голень.", "Ровный темп: должен мочь говорить фразами."], yt: "работа на боксёрской груше для начинающих" },
+    bagFast: { pos: [pz({ props: [BAGP] }, GUARD), pz({ el2: [80,42], ha2: [95,40], props: [BAGP] }, GUARD)], cap: ["Стойка", "Серия"], tips: ["30 секунд максимум ударов прямыми.", "Ноги на месте, работают руки и корпус.", "В отдых встряхни руки, восстанови дыхание."], yt: "интервальная тренировка боксёрская груша" },
+    swing: { pos: [SW_LO, SW_HI], cap: ["Замах между ног", "Толчок тазом"], tips: ["Движение от таза: назад и резко вперёд.", "Руки — просто верёвки, гиря летит до груди.", "Вверху ягодицы сжаты, спина прямая, пятки на полу."], yt: "махи гирей двумя руками техника" },
+    deadbug: { pos: [
+      pz({ el: [28,84], ha: [28,70], kn: [56,82], ft: [72,82] }, LIE),
+      pz({ el: [16,97], ha: [5,99], el2: [28,84], ha2: [28,70], kn: [72,95], ft: [90,97], kn2: [56,82], ft2: [72,82] }, LIE)
+    ], cap: ["Старт", "Рука и нога в стороны"], tips: ["Поясница всё время прижата к полу.", "Противоположные рука и нога уходят медленно.", "Выдох при опускании."], yt: "упражнение мёртвый жук техника" },
+    kbdl: { pos: [
+      { hd: [70,50], sh: [62,54], el: [62,68], ha: [62,82], hp: [44,70], kn: [62,86], ft: [60,104], props: [["kb", 62, 90]] },
+      pz({ props: [["kb", 60, 71]] })
+    ], tips: ["Таз назад, спина нейтральная.", "Вставай за счёт ягодиц, гиря близко к ногам.", "Вес на всей стопе."], yt: "становая тяга с гирей техника" },
+    kbrow: { pos: [ROW_DN, ROW_UP], cap: ["Рука прямая", "Локоть к поясу"], tips: ["Колено и рука на опоре, спина параллельно полу.", "Тяни гирю к поясу, локоть вдоль корпуса.", "Корпус не проворачивай."], yt: "тяга гири в наклоне одной рукой с опорой" },
+    kbpress: { pos: [PR_LO, PR_HI], cap: ["Гиря на груди", "Жим вверх"], tips: ["Гиря лежит на предплечье, запястье прямое.", "Жми вверх, рука у уха.", "Пресс и ягодицы напряжены, не прогибайся."], yt: "жим гири одной рукой стоя техника" },
+    bridge: { pos: [
+      pz({ el: [40,100], ha: [50,101], kn: [70,84], ft: [80,104], kn2: [70,88], ft2: [86,80] }, LIE),
+      { hd: [20,95], sh: [30,98], el: [42,100], ha: [52,101], hp: [56,84], kn: [72,78], ft: [80,104], kn2: [72,76], ft2: [88,68] }
+    ], tips: ["Опора на пятку, носок на себя.", "Поднимай таз ягодицей, не поясницей.", "Если отдаёт в голень — на двух ногах."], yt: "ягодичный мост на одной ноге техника" },
+    tgu: { pos: [
+      pz({ el: [28,84], ha: [28,70], kn: [70,86], ft: [80,104], kn2: [72,99], ft2: [90,101], props: [["kb", 28, 64]] }, LIE),
+      { hd: [44,72], sh: [40,80], el: [40,66], ha: [40,52], el2: [32,92], ha2: [26,104], hp: [56,99], kn: [70,86], ft: [80,104], kn2: [74,100], ft2: [92,102], props: [["kb", 40, 46]] },
+      PR_HI
+    ], cap: ["Лёжа, гиря вверху", "Опора на руку", "Встал"], tips: ["Смотри на гирю всё время.", "Рука с гирей прямая и вертикальная.", "Начни с лёгкой гири или без неё."], yt: "турецкий подъём с гирей техника" },
+    circuit: { pos: [SW_HI, ROW_UP, PR_HI], cap: ["10 махов", "5 тяг на руку", "5 жимов на руку"], tips: ["Упражнения идут подряд без пауз.", "Отдых только после круга.", "Темп ровный, пульс в аэробной зоне."], yt: "комплекс с гирей махи тяга жим" }
+  };
+  let figN = 0;
+  function fig(p) {
+    const id = "ah" + (++figN), L = (a, b, w, op) => a && b ? `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke-width="${w}"${op ? ` opacity="${op}"` : ""}/>` : "";
+    const g = Object.assign({ el2: p.el, ha2: p.ha, kn2: p.kn, ft2: p.ft }, p);
+    let props = "";
+    (p.props || []).forEach(q => {
+      const [t, a, b, c, d] = q;
+      if (t === "bar") props += `<line x1="${a}" y1="${c}" x2="${b}" y2="${c}" stroke-width="3" class="pr"/>`;
+      else if (t === "bench" || t === "step") props += `<rect x="${a}" y="${b}" width="${c}" height="${d}" rx="2" class="bench" stroke-width="1.5"/>`;
+      else if (t === "bag") props += `<line x1="${a + c/2}" y1="0" x2="${a + c/2}" y2="${b}" stroke-width="1.2"/><rect x="${a}" y="${b}" width="${c}" height="${d}" rx="4" class="bag" stroke-width="1.5"/>`;
+      else if (t === "kb") props += `<path d="M${a-4} ${b-3} Q${a} ${b-12} ${a+4} ${b-3}" fill="none" stroke-width="2"/><circle cx="${a}" cy="${b+1}" r="5.5" class="kb" stroke-width="1.5"/>`;
+      else if (t === "db") props += `<rect x="${a-4}" y="${b-2}" width="8" height="4" rx="1" class="db" stroke-width="1"/>`;
+      else if (t === "arr") props += `<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke-width="2" class="arr" marker-end="url(#${id})"/>`;
+    });
+    const back = p.nolegs ? L(g.sh, g.el2, 3.4, .4) + L(g.el2, g.ha2, 3.4, .4)
+      : L(g.hp, g.kn2, 3.6, .4) + L(g.kn2, g.ft2, 3.6, .4) + L(g.sh, g.el2, 3.4, .4) + L(g.el2, g.ha2, 3.4, .4);
+    const front = (p.nolegs ? "" : L(g.sh, g.hp, 4.2) + L(g.hp, g.kn, 3.8) + L(g.kn, g.ft, 3.8) + (p.to ? L(g.ft, p.to, 3.4) : ""))
+      + L(g.sh, g.el, 3.6) + L(g.el, g.ha, 3.6);
+    return `<svg viewBox="0 0 120 110" class="fig" aria-hidden="true">
+      <defs><marker id="${id}" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrh"/></marker></defs>
+      ${p.nofloor ? "" : `<line x1="2" y1="104.5" x2="118" y2="104.5" stroke-width="1.5" class="floor"/>`}
+      <g stroke-linecap="round" class="fg">${props}${back}${front}<circle cx="${g.hd[0]}" cy="${g.hd[1]}" r="6.2" class="head" stroke-width="2.4"/></g>
+    </svg>`;
+  }
+  function openInfo(e) {
+    const d = INFO[KEYMAP[e.n]], sh = $("sheet");
+    const caps = d ? (d.cap || (d.pos.length === 1 ? ["Положение"] : ["Старт", "Финиш"])) : [];
+    sh.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(e.n)}">
+      <div class="sheet-head"><div><div class="label">Техника</div><h3>${esc(e.n)}</h3></div><button class="navbtn" data-close aria-label="Закрыть">✕</button></div>
+      ${d ? `<div class="poses">${d.pos.map((p, j) => `<figure>${fig(p)}<figcaption>${caps[j] || ""}</figcaption></figure>`).join("")}</div>` : ""}
+      <div class="ex-tip">${esc(e.tip)}</div>
+      ${d ? `<ul class="tips">${d.tips.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
+      <div class="ex-meta">${e.sets > 1 ? e.sets + " × " : ""}${esc(e.reps)}${e.rest ? ` · отдых ${e.rest} с` : ""}${e.prep ? ` · подготовка ${e.prep} с` : ""}</div>
+      <a class="btn yt" href="https://www.youtube.com/results?search_query=${encodeURIComponent(d ? d.yt : e.n + " техника")}" target="_blank" rel="noopener">▶ Видео на YouTube</a>
+    </div>`;
+    sh.hidden = false;
+  }
+  $("sheet").addEventListener("click", e => { if (e.target.id === "sheet" || e.target.closest("[data-close]")) $("sheet").hidden = true; });
+
+  // ======== Вести голосом ========
+  let coach = null, wakeLock = null, ruVoice = null;
+  const canSpeak = "speechSynthesis" in window;
+  // Настройки звука хранятся на этом устройстве
+  const SKEY = "gump-sound";
+  let snd = { mode: "voice", session: "auto" };
+  try { Object.assign(snd, JSON.parse(localStorage.getItem(SKEY)) || {}); } catch (e) {}
+  if (snd.mode !== "voice" && snd.mode !== "signals") snd.mode = "voice";
+  const saveSnd = () => { try { localStorage.setItem(SKEY, JSON.stringify(snd)); } catch (e) {} };
+  const hasSession = !!(navigator.audioSession && "type" in navigator.audioSession);
+  function applySession() { if (!hasSession) return; try { navigator.audioSession.type = snd.session || "auto"; } catch (e) {} }
+  applySession();
+  const isMuted = () => !!(coach && coach.muted);
+
+  function pickVoice() {
+    try {
+      const vs = speechSynthesis.getVoices().filter(v => /^ru/i.test(v.lang));
+      ruVoice = vs.find(v => /Milena|Милена/i.test(v.name)) || vs.find(v => v.localService) || vs[0] || null;
+    } catch (e) {}
+  }
+  if (canSpeak) { pickVoice(); try { speechSynthesis.addEventListener("voiceschanged", pickVoice); } catch (e) {} }
+  function say(t, now) {
+    if (isMuted() || snd.mode !== "voice" || !canSpeak || !t) return;
+    try {
+      if (now) speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(t); u.lang = "ru-RU"; if (ruVoice) u.voice = ruVoice; u.rate = 1.03;
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function tone(f, d, v, delay) {
+    if (!actx || isMuted()) return;
+    try {
+      const o = actx.createOscillator(), g = actx.createGain(), at = actx.currentTime + (delay || 0);
+      o.frequency.value = f; g.gain.setValueAtTime(0.0001, at);
+      g.gain.exponentialRampToValueAtTime(v || 0.4, at + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, at + d);
+      o.connect(g); g.connect(actx.destination); o.start(at); o.stop(at + d + 0.03);
+    } catch (e) {}
+  }
+  // Сигналы: у каждого события свой рисунок
+  const SIG = {
+    start: () => { tone(880, .12); tone(1320, .4, .5, .14); },                       // вверх: начали
+    stop: () => { tone(988, .16); tone(740, .16, .4, .18); tone(494, .5, .45, .36); }, // вниз: стоп
+    rest: () => tone(392, .35, .3),                                                   // низкий: отдых
+    ready: () => { tone(660, .14); tone(660, .14, .4, .24); },                         // два средних: приготовься
+    gloves: () => { tone(587, .13); tone(587, .13, .4, .2); tone(587, .13, .4, .4); tone(784, .3, .4, .6); }, // перчатки
+    n3: () => tone(523, .13), n2: () => tone(587, .13), n1: () => tone(659, .2),
+    done: () => { tone(784, .2); tone(988, .2, .4, .22); tone(1175, .55, .45, .44); }
+  };
+  const VTONE = { start: () => tone(990, .4, .5), stop: () => tone(990, .55, .5), n3: () => tone(620, .14), n2: () => tone(620, .14), n1: () => tone(620, .14), done: () => { tone(880, .3); tone(1175, .5, .45, .32); } };
+
+  // ---- Свои записи фраз (IndexedDB) ----
+  const PHRASES = [["start", "Начали"], ["stop", "Стоп"], ["rest", "Отдых"], ["ready", "Приготовься"], ["gloves", "Надевай перчатки"], ["n3", "Три"], ["n2", "Два"], ["n1", "Один"]];
+  const clipRaw = {}, clipBuf = {};
+  let clipEnd = 0, rec = null;
+  function idb() {
+    return new Promise((res, rej) => {
+      try { const r = indexedDB.open("gump-audio", 1); r.onupgradeneeded = () => r.result.createObjectStore("clips"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }
+      catch (e) { rej(e); }
+    });
+  }
+  async function idbWrite(fn) { const db = await idb(); return new Promise((res, rej) => { const tx = db.transaction("clips", "readwrite"); fn(tx.objectStore("clips")); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); }
+  (async () => {
+    try {
+      const db = await idb();
+      await new Promise(res => {
+        const rq = db.transaction("clips", "readonly").objectStore("clips").openCursor();
+        rq.onsuccess = () => { const c = rq.result; if (c) { clipRaw[c.key] = c.value; c.continue(); } else res(); };
+        rq.onerror = () => res();
+      });
+    } catch (e) {}
+  })();
+  async function decodeClip(name) {
+    if (!actx || !clipRaw[name]) return null;
+    if (clipBuf[name]) return clipBuf[name];
+    try { clipBuf[name] = await new Promise((ok, no) => actx.decodeAudioData(clipRaw[name].slice(0), ok, no)); } catch (e) { clipBuf[name] = null; }
+    return clipBuf[name];
+  }
+  function decodeAll() { PHRASES.forEach(([k]) => decodeClip(k)); }
+  async function playClip(name) {
+    const b = await decodeClip(name); if (!b || isMuted()) return false;
+    try {
+      const s = actx.createBufferSource(); s.buffer = b; s.connect(actx.destination);
+      const t = Math.max(actx.currentTime, clipEnd); s.start(t); clipEnd = t + b.duration + 0.05; return true;
+    } catch (e) { return false; }
+  }
+  async function storeClip(name, ab) { clipRaw[name] = ab; delete clipBuf[name]; try { await idbWrite(st => st.put(ab, name)); } catch (e) {} decodeClip(name); }
+  async function delClip(name) { delete clipRaw[name]; delete clipBuf[name]; try { await idbWrite(st => st.delete(name)); } catch (e) {} }
+
+  // Одна точка выхода звука: голос, сигналы или свои записи
+  function announce(types, text) {
+    if (isMuted()) return;
+    if (snd.mode === "voice") { types.forEach(t => VTONE[t] && VTONE[t]()); say(text, true); return; }
+    types.forEach((t, j) => {
+      if (snd.mode === "clips" && clipRaw[t]) playClip(t);
+      else setTimeout(() => { if (!isMuted() && SIG[t]) SIG[t](); }, j * 750);
+    });
+  }
+
+  async function lockScreen() { try { if ("wakeLock" in navigator && document.visibilityState === "visible") wakeLock = await navigator.wakeLock.request("screen"); } catch (e) {} }
+  function unlockScreen() { try { wakeLock && wakeLock.release(); } catch (e) {} wakeLock = null; }
+  document.addEventListener("visibilitychange", () => { if (coach && document.visibilityState === "visible") lockScreen(); });
+  const plural = (n, a, b, c) => { const m = n % 100, m1 = n % 10; return m > 10 && m < 20 ? c : m1 === 1 ? a : m1 >= 2 && m1 <= 4 ? b : c; };
+  const durWords = sec => { const m = Math.floor(sec / 60), s = sec % 60; return [m ? m + " " + plural(m, "минута", "минуты", "минут") : "", s ? s + " " + plural(s, "секунда", "секунды", "секунд") : ""].filter(Boolean).join(" "); };
+  const repWords = r => String(r).replace(/(\d+)–(\d+)/g, "от $1 до $2").replace(/\s*\/\s*ногу/g, " на каждую ногу").replace(/\s*\/\s*руку/g, " на каждую руку")
+    .replace(/\s*\/\s*сторону/g, " на каждую сторону").replace(/\bсек\b/g, "секунд").replace(/\bмин\b/g, "минуты").replace(/(\d) с\b/g, "$1 секунд");
+  const isTimed = e => !!e.hold;
+  // Подготовка перед упражнением: поле prep (сек); перчатки — только если до этого были без них
+  const needGloves = (st, prev) => !!(st && st.e.gloves && !(prev && prev.e.gloves));
+  const prepSec = (st, prev) => !st || (prev && prev.i === st.i) ? 0 : st.e.gloves ? (needGloves(st, prev) ? (st.e.prep || 45) : 0) : (st.e.prep || 0);
+  function stepIntro(st, withName) {
+    const e = st.e;
+    return (withName ? e.n + ". " : "") + (st.n > 1 ? `Подход ${st.k + 1} из ${st.n}. ` : "") + (isTimed(e) ? durWords(e.hold) : repWords(e.reps)) + ".";
+  }
+  function setDone(c, i, k) {
+    const id = c.key + ":" + i, st = Object.assign({ d: [], r: "" }, state.sets[id]);
+    st.d = (st.d || []).slice(); st.d[k] = true;
+    for (let x = 0; x < st.d.length; x++) st.d[x] = !!st.d[x];
+    state.sets[id] = st;
+    const all = exFor(c.s).every(({ e, i: j }) => { const n = setsFor(c.s.wk, e.sets), d = (state.sets[c.key + ":" + j] || {}).d || []; return Array.from({ length: n }, (_, q) => !!d[q]).every(Boolean); });
+    if (all) state.done[c.key] = true;
+    save();
+  }
+  function prepAnnounce(st, prev, lead) {
+    if (needGloves(st, prev)) announce(["gloves"], `${lead || ""}${stepIntro(st, true)} Надевай перчатки.`);
+    else announce(["ready"], `${lead || ""}${stepIntro(st, true)} Приготовься.`);
+  }
+  function startCoach(key) {
+    const item = curToday.list.find(x => x.key === key); if (!item) return;
+    const steps = [];
+    exFor(item.s).forEach(({ e, i }) => {
+      const n = setsFor(item.s.wk, e.sets), d = (state.sets[key + ":" + i] || {}).d || [];
+      for (let k = 0; k < n; k++) if (!d[k]) steps.push({ e, i, k, n });
+    });
+    ensureAudio(); timer = null; $("timerbar").hidden = true;
+    const p = Math.max(10, prepSec(steps[0], null));
+    coach = { key, s: item.s, steps, idx: 0, muted: false, paused: false, phase: steps.length ? "ready" : "done", end: Date.now() + p * 1000, total: p * 1000, left: 0, lastSec: null, flags: {}, workStart: 0 };
+    $("coach").hidden = false; document.body.style.overflow = "hidden";
+    lockScreen();
+    if (!steps.length) say("Все подходы этой тренировки уже отмечены.", true);
+    else prepAnnounce(steps[0], null, "Начинаем. ");
+    renderCoach();
+  }
+  function stopCoach() {
+    coach = null; try { canSpeak && speechSynthesis.cancel(); } catch (e) {}
+    unlockScreen(); $("coach").hidden = true; document.body.style.overflow = "";
+    renderHeader(); renderWeeks(); renderToday();
+  }
+  function setPhase(ph, sec) {
+    const c = coach; c.phase = ph; c.flags = {}; c.lastSec = null;
+    if (sec != null) { c.total = sec * 1000; c.end = Date.now() + c.total; } else { c.workStart = Date.now(); }
+  }
+  function startWork() {
+    const c = coach, st = c.steps[c.idx];
+    if (isTimed(st.e)) { setPhase("work", st.e.hold); announce(["start"], "Начали!"); }
+    else { setPhase("reps"); announce(["start"], `Начали! ${repWords(st.e.reps)}. Нажми «Готово», когда закончишь.`); }
+  }
+  function finishSet(mark, byTimer) {
+    const c = coach, st = c.steps[c.idx];
+    if (mark) setDone(c, st.i, st.k);
+    const next = c.steps[c.idx + 1];
+    if (!next) { c.phase = "done"; announce(byTimer ? ["stop", "done"] : ["done"], "Тренировка завершена. Отличная работа!"); renderCoach(); return; }
+    const rest = Math.max(10, st.e.rest || 0, prepSec(next, st)), gl = needGloves(next, st);
+    setPhase("rest", rest);
+    c.flags.gloves = gl;
+    const short = rest <= 12; // короткий отдых: «приготовься» сразу, вместе с отдыхом
+    if (short) c.flags.ready = true;
+    announce([...(byTimer ? ["stop"] : []), "rest", ...(gl ? ["gloves"] : []), ...(short ? ["ready"] : [])],
+      `${byTimer ? "Стоп. " : mark ? "Есть. " : ""}Отдых ${durWords(rest)}.${gl ? " Надевай перчатки." : ""}${short ? ` Приготовься. ${stepIntro(next, next.i !== st.i)}` : ""}`);
+    renderCoach();
+  }
+  function advanceAfterRest() { coach.idx++; startWork(); renderCoach(); }
+  function coachTick() {
+    const c = coach; if (!c || c.paused) return;
+    if (c.phase === "reps") { renderCoachTime(); return; }
+    if (c.phase === "done") return;
+    const left = c.end - Date.now(), sec = Math.max(0, Math.ceil(left / 1000));
+    if (sec !== c.lastSec) {
+      c.lastSec = sec;
+      const st = c.steps[c.idx], next = c.steps[c.idx + 1];
+      const up = c.phase === "rest" ? next : st, prev = c.phase === "rest" ? st : c.steps[c.idx - 1];
+      // «Приготовься» за 10 секунд (в первой короткой подготовке уже сказано)
+      if ((c.phase === "rest" || (c.phase === "ready" && c.total > 12000)) && up && sec <= 10 && sec > 3 && !c.flags.ready) {
+        c.flags.ready = true;
+        announce(["ready"], `Приготовься. ${stepIntro(up, !prev || up.i !== prev.i)}`);
+      }
+      if (c.phase === "work" && st.e.hold >= 60 && sec === 30 && !c.flags.h30) { c.flags.h30 = true; say("Осталось 30 секунд."); }
+      if (c.phase === "work" && st.e.hold >= 25 && sec === 10 && !c.flags.h10) { c.flags.h10 = true; say("10 секунд."); }
+      if (sec >= 1 && sec <= 3) announce(["n" + sec], null);
+      if (sec === 0) {
+        if (c.phase === "ready") { startWork(); renderCoach(); return; }
+        if (c.phase === "work") { finishSet(true, true); return; }
+        if (c.phase === "rest") { advanceAfterRest(); return; }
+      }
+    }
+    renderCoachTime();
+  }
+  setInterval(coachTick, 200);
+  const PH = { ready: "Приготовься", work: "Работа", reps: "Твой подход", rest: "Отдых", done: "Готово" };
+  function renderCoachTime() {
+    const c = coach; if (!c) return;
+    let txt = "", pct = 0;
+    if (c.phase === "reps") { const el = (c.paused ? c.left : Date.now() - c.workStart) / 1000; txt = fmtPace(Math.floor(el)); }
+    else if (c.phase !== "done") { const left = c.paused ? c.left : Math.max(0, c.end - Date.now()); txt = fmtPace(Math.ceil(left / 1000)); pct = 100 - left / c.total * 100; }
+    $("cTime").textContent = txt; $("cBar").style.width = pct + "%";
+  }
+  function renderCoach() {
+    const c = coach; if (!c) return;
+    const st = c.steps[c.idx], next = c.steps[c.idx + 1], done = c.phase === "done";
+    const showSt = c.phase === "rest" ? next : st;
+    const gl = (c.phase === "rest" && c.flags.gloves) || (c.phase === "ready" && needGloves(st, c.steps[c.idx - 1]));
+    $("coach").dataset.phase = c.phase;
+    $("cPhase").textContent = (c.paused ? "Пауза · " : "") + PH[c.phase] + (gl ? " · надевай перчатки 🥊" : "");
+    $("cName").textContent = done ? "Тренировка завершена" : showSt.e.n;
+    $("cSet").textContent = done ? `${c.s.title}: все подходы отмечены` : (c.phase === "rest" ? "Дальше: " : "") + (showSt.n > 1 ? `подход ${showSt.k + 1} из ${showSt.n} · ` : "") + (isTimed(showSt.e) ? fmtHold(showSt.e.hold) : showSt.e.reps);
+    $("cTip").textContent = done ? "" : showSt.e.tip;
+    $("cCount").textContent = done ? "" : `Шаг ${Math.min(c.idx + 1, c.steps.length)} из ${c.steps.length}`;
+    $("cDone").hidden = c.phase !== "reps" || c.paused;
+    $("cPause").textContent = c.paused ? "▶ Продолжить" : "⏸ Пауза";
+    $("cPause").hidden = $("cSkip").hidden = $("cInfo").hidden = done;
+    $("cMute").textContent = c.muted ? "🔇 Звук выкл." : "🔊 Звук вкл.";
+    $("cExit").textContent = done ? "Закрыть" : "✕ Завершить";
+    renderCoachTime();
+  }
+  $("coach").addEventListener("click", e => {
+    const c = coach; if (!c) return;
+    const b = e.target.closest("button"); if (!b) return;
+    ensureAudio();
+    if (b.id === "cExit") { stopCoach(); return; }
+    if (b.id === "cSound") { openSound(); return; }
+    if (b.id === "cMute") { c.muted = !c.muted; if (c.muted) { try { speechSynthesis.cancel(); } catch (x) {} } else { say("Звук включён.", true); if (snd.mode !== "voice") SIG.ready(); } renderCoach(); return; }
+    if (b.id === "cInfo") { const st = c.phase === "rest" && c.steps[c.idx + 1] ? c.steps[c.idx + 1] : c.steps[c.idx]; openInfo(st.e); return; }
+    if (c.phase === "done") return;
+    if (b.id === "cPause") {
+      if (!c.paused) { c.paused = true; c.left = c.phase === "reps" ? Date.now() - c.workStart : Math.max(0, c.end - Date.now()); try { speechSynthesis.cancel(); } catch (x) {} say("Пауза."); }
+      else { c.paused = false; if (c.phase === "reps") c.workStart = Date.now() - c.left; else c.end = Date.now() + c.left; c.lastSec = null; say("Продолжаем.", true); lockScreen(); }
+      renderCoach(); return;
+    }
+    if (b.id === "cDone") { if (c.phase === "reps") finishSet(true, false); return; }
+    if (b.id === "cSkip") {
+      c.paused = false;
+      if (c.phase === "ready") { startWork(); renderCoach(); }
+      else if (c.phase === "rest") { advanceAfterRest(); }
+      else {
+        const cur = c.steps[c.idx], next = c.steps[c.idx + 1];
+        if (!next) { finishSet(false, false); return; }
+        c.idx++; setPhase("ready", Math.max(10, prepSec(next, cur)));
+        prepAnnounce(next, cur, "Пропускаем. "); renderCoach();
+      }
+    }
+  });
+
+  // ---- Настройки звука ----
+  const canRec = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+  let clipTarget = null;
+  function openSound(msg) {
+    const sh = $("sheet");
+    const MODES = [["voice", "Голос", "Синтез речи: упражнение, подход, отдых, «приготовься»"], ["signals", "Только сигналы", "Без голоса: свой тон на каждое событие"]];
+    const SESS = [["auto", "Не менять", "Как решит iOS"], ["ambient", "ambient", "Смешивается с музыкой; молчит в беззвучном режиме"], ["transient", "transient", "Короткий звук поверх музыки"]];
+    const opt = (list, cur, attr) => list.map(([v, t, d]) => `<button type="button" class="opt" ${attr}="${v}" aria-pressed="${cur === v}"><b>${t}</b><span>${d}</span></button>`).join("");
+    sh.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="Звук ведущего">
+      <div class="sheet-head"><div><div class="label">Вести голосом</div><h3>Звук ведущего</h3></div><button class="navbtn" data-close aria-label="Закрыть">✕</button></div>
+      <div class="label">Подсказки</div><div class="opts">${opt(MODES, snd.mode, "data-sm")}</div>
+      <div class="label">Аудиосессия iOS</div>
+      ${hasSession ? `<div class="opts">${opt(SESS, snd.session, "data-ss")}</div><div class="hint">Включи музыку, выбери вариант и нажми «Проверить звук». Оставь тот, при котором музыка не встаёт на паузу.</div>`
+        : `<div class="hint">Этот браузер не поддерживает navigator.audioSession, переключатель не сработает. Обнови iOS: в свежих версиях Safari он есть.</div>`}
+      <button type="button" class="btn" data-test>▶ Проверить звук</button>
+      <div class="hint" id="sndStatus" aria-live="polite">${msg || ""}</div>
+    </div>`;
+    sh.hidden = false;
+  }
+  const sndMsg = t => { const s = $("sndStatus"); if (s) s.textContent = t; };
+  async function recordClip(name) {
+    if (rec) { rec.mr.stop(); return; }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mr = new MediaRecorder(stream), chunks = [];
+      rec = { mr, name };
+      mr.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+      mr.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop()); rec = null;
+        const blob = new Blob(chunks, { type: mr.mimeType || "audio/mp4" });
+        await storeClip(name, await blob.arrayBuffer());
+        openSound("Записано. Нажми ▶, чтобы послушать.");
+      };
+      mr.start(); openSound("Идёт запись… Скажи фразу и нажми «Стоп» (максимум 4 секунды).");
+      setTimeout(() => { if (rec && rec.mr === mr) mr.stop(); }, 4000);
+    } catch (e) { rec = null; openSound("Нет доступа к микрофону. Разреши его в настройках или загрузи файл 📁."); }
+  }
+  $("sheet").addEventListener("click", async e => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.sm) { snd.mode = b.dataset.sm; saveSnd(); openSound(); return; }
+    if (b.dataset.ss) { snd.session = b.dataset.ss; saveSnd(); applySession(); openSound(`Аудиосессия: ${snd.session}.`); return; }
+    if (b.dataset.rec) { ensureAudio(); recordClip(b.dataset.rec); return; }
+    if (b.dataset.file) { clipTarget = b.dataset.file; $("clipFile").click(); return; }
+    if (b.dataset.play) { ensureAudio(); clipEnd = 0; const ok = await playClip(b.dataset.play); if (!ok) sndMsg("Не получилось воспроизвести эту запись. Попробуй другой файл."); return; }
+    if (b.dataset.del) { await delClip(b.dataset.del); openSound("Запись удалена."); return; }
+    if (b.hasAttribute("data-test")) {
+      ensureAudio(); decodeAll(); applySession(); clipEnd = 0;
+      const seq = [[0, ["ready"], "Приготовься."], [1500, ["n3"], null], [2500, ["n2"], null], [3500, ["n1"], null], [4500, ["start"], "Начали!"], [6500, ["stop", "rest"], "Стоп. Отдых."]];
+      seq.forEach(([t, ty, tx]) => setTimeout(() => announce(ty, tx), t));
+      sndMsg("Играет проверка: приготовься → 3-2-1 → начали → стоп и отдых.");
+    }
+  });
+  $("sheet").addEventListener("change", async e => {
+    if (e.target.id !== "clipFile") return;
+    const f = e.target.files[0]; e.target.value = "";
+    if (!f || !clipTarget) return;
+    if (f.size > 2e6) { sndMsg("Файл слишком большой: нужна короткая фраза до 2 МБ."); return; }
+    ensureAudio();
+    const ab = await f.arrayBuffer(); let ok = true;
+    if (actx) { try { await new Promise((y, n) => actx.decodeAudioData(ab.slice(0), y, n)); } catch (x) { ok = false; } }
+    if (!ok) { sndMsg("Этот файл не читается как звук. Подойдут m4a, mp3 или wav."); return; }
+    await storeClip(clipTarget, ab); openSound("Загружено. Нажми ▶, чтобы послушать.");
+  });
+
+  function render() { renderSettings(); renderHeader(); renderWeeks(); renderToday(); renderLog(); }
+
+  // ---- События ----
+  $("view-today").addEventListener("change", e => {
+    const bf = e.target.closest("[data-brkfrom]");
+    if (bf) {
+      const b = activeBreak();
+      if (b && /^\d{4}-\d\d-\d\d$/.test(bf.value)) b.from = bf.value; else bf.value = b ? b.from : "";
+      bf.blur(); save(); setTimeout(render, 0); return;
+    }
+    const v = e.target.closest("[data-vid]");
+    if (v) {
+      const url = v.value.trim();
+      if (url && !/^https:\/\//.test(url)) { v.value = videoUrl(v.dataset.vid); return; }
+      state.videos = Object.assign({}, state.videos, { [v.dataset.vid]: url.slice(0, 300) });
+      save(); setTimeout(renderToday, 0); return;
+    }
+    const r = e.target.closest("[data-res]"); if (!r) return;
+    const id = r.dataset.res;
+    state.sets[id] = Object.assign({ d: [], r: "" }, state.sets[id], { r: r.value.trim().slice(0, 80) });
+    save();
+  });
+  document.addEventListener("click", e => {
+    if (!e.target.closest("#weeks, #view-today")) return;
+    if (e.target.closest("[data-sound]")) { openSound(); return; }
+    const cb = e.target.closest("[data-coach]");
+    if (cb) { startCoach(cb.dataset.coach); return; }
+    const inf = e.target.closest("[data-info]");
+    if (inf) { const [ex, i] = inf.dataset.info.split("|"); const E = EX[ex] || EX[+ex]; if (E && E[+i]) openInfo(E[+i]); return; }
+    const bk = e.target.closest("[data-break]");
+    if (bk) {
+      const t = today0();
+      if (bk.dataset.break === "start") { if (!activeBreak()) state.breaks.push({ from: iso(t) }); }
+      else {
+        const y = new Date(t); y.setDate(t.getDate() - 1);
+        state.breaks = state.breaks.map(b => b.to ? b : Object.assign({}, b, { to: iso(y) })).filter(b => b.to >= b.from);
+      }
+      save(); render(); return;
+    }
+    const c = e.target.closest(".check");
+    if (c) {
+      const k = c.dataset.key;
+      if (state.done[k]) delete state.done[k]; else state.done[k] = true;
+      save(); renderHeader(); renderWeeks(); renderToday(); return;
+    }
+    const st = e.target.closest("[data-set]");
+    if (st) { toggleSet(st); return; }
+    const h = e.target.closest("[data-hold]");
+    if (h) { ensureAudio(); startTimer(+h.dataset.hold, "Удержание"); return; }
+    const nv = e.target.closest("[data-nav]");
+    if (nv) {
+      const n = +nv.dataset.nav;
+      if (n === 0) viewDate = today0(); else viewDate.setDate(viewDate.getDate() + n);
+      renderToday(); return;
+    }
+    const op = e.target.closest("[data-open]");
+    if (op) { viewDate = parseISO(op.dataset.open); renderToday(); showView("today"); return; }
+    const sh = e.target.closest("[data-shot]");
+    if (sh) { shotDate = sh.dataset.shot; $("shotInput").click(); return; }
+    const ld = e.target.closest("[data-logdate]");
+    if (ld) { $("logDate").value = ld.dataset.logdate; $("logKm").value = ""; $("logNote").value = ""; showView("log"); $("logKm").focus(); return; }
+    const l = e.target.closest("[data-log]");
+    if (l) {
+      const m = l.dataset.log.match(/w(\d+)d(\d+)(?:s(\d+))?/), w = +m[1], d = +m[2], s = PLAN[w][d][+(m[3] || 0)];
+      $("logDate").value = iso(dayDate(w, d));
+      $("logKm").value = s.km;
+      $("logNote").value = s.title;
+      showView("log"); $("logTime").focus();
+    }
+  });
+  $("raceDate").addEventListener("change", e => {
+    if (!e.target.value) return;
+    const d = parseISO(e.target.value);
+    if (d.getDay() !== 0) d.setDate(d.getDate() + (7 - d.getDay()));
+    state.race = iso(d); e.target.value = state.race; save(); render();
+  });
+  $("goalTime").addEventListener("change", e => {
+    const s = parseTime(e.target.value);
+    if (!s || s < 7200 || s > 25200) { e.target.value = state.goal; return; }
+    state.goal = fmtTime(s); save(); render();
+  });
+  $("logDate").value = iso(new Date());
+  $("logForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const km = parseFloat(String($("logKm").value).replace(",", ".")), sec = parseTime($("logTime").value);
+    if (!sec || !(km > 0)) { $("logHint").textContent = "Проверь время: например 58:30 или 1:45:00"; $("logTime").focus(); return; }
+    const date = $("logDate").value;
+    state.log.push(Object.assign({ id: Date.now().toString(36), date, km: Math.round(km*100)/100, sec, feel: +$("logFeel").value, note: $("logNote").value.trim() }, pendingExtra || {}));
+    pendingExtra = null;
+    const S = date ? sessionsFor(parseISO(date)) : { list: [] };
+    let marked = "";
+    if (S.w != null) S.list.forEach(x => { if (isRun(x.s)) { state.done[x.key] = true; marked = x.s.title; } });
+    $("logKm").value = ""; $("logTime").value = ""; $("logNote").value = ""; $("shotStatus").textContent = "";
+    $("logHint").textContent = marked ? `Пробежка добавлена, в плане отмечено: ${marked}` : "Пробежка добавлена";
+    save(); renderLog(); renderHeader(); renderWeeks(); renderToday();
+  });
+  $("logTable").addEventListener("click", e => {
+    const b = e.target.closest("[data-del]"); if (!b) return;
+    if (b.dataset.confirm !== "1") { b.dataset.confirm = "1"; b.textContent = "Точно?"; return; }
+    state.log = state.log.filter(r => r.id !== b.dataset.del); save(); renderLog();
+  });
+
+  function showView(v) {
+    ["today","plan","log"].forEach(n => { $("view-"+n).hidden = n !== v; $("tab-"+n).setAttribute("aria-selected", n === v); });
+    try { history.replaceState(null, "", "#" + v); } catch (e) {}
+    const cur = v === "plan" && document.querySelector("details.week.current");
+    if (cur) cur.scrollIntoView({ block: "start" }); else window.scrollTo(0, 0);
+  }
+  document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => showView(t.dataset.view)));
+
+  render();
+  showView(["#plan", "#log"].includes(location.hash) ? location.hash.slice(1) : "today");
+
+  // ---- Резервная копия ----
+  $("bkSave").addEventListener("click", async () => {
+    const name = "gump-" + iso(new Date()) + ".json";
+    const json = JSON.stringify(state, null, 1);
+    const st = $("bkStatus");
+    try {
+      const file = new File([json], name, { type: "application/json" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: name });
+        st.textContent = "Готово. Выбери «Сохранить в Файлы».";
+        return;
+      }
+    } catch (e) { if (e && e.name === "AbortError") return; }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([json], { type: "application/json" }));
+    a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    st.textContent = "Файл " + name + " сохранён в загрузки.";
+  });
+  $("bkFile").addEventListener("change", async e => {
+    const f = e.target.files[0]; e.target.value = "";
+    if (!f) return;
+    const st = $("bkStatus");
+    try {
+      const d = JSON.parse(await f.text());
+      if (!d || typeof d !== "object" || !Array.isArray(d.log) || typeof d.done !== "object") throw new Error();
+      state = Object.assign({ race: "2027-03-07", goal: "4:15:00", done: {}, log: [], sets: {}, breaks: [] }, d);
+      if (!Array.isArray(state.breaks)) state.breaks = [];
+      save(); render();
+      st.textContent = `Восстановлено: ${state.log.length} пробежек в журнале.`;
+    } catch (err) { st.textContent = "Это не похоже на копию Gump. Нужен файл gump-….json."; }
+  });
+
+  if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register("sw.js").catch(() => {}); } catch (e) {} }
+})();
+</script>
+</body></html>
