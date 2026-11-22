@@ -188,6 +188,41 @@ td.r, th.r { text-align: right }
 .backup { margin-top: 14px; display: grid; gap: 10px }
 .backup h3 { font-family: var(--f-title); font-size: 22px; font-weight: 900 }
 .backup .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center }
+/* Техника и голосовой режим */
+button.ex-name { all: unset; cursor: pointer; font-weight: 700; display: inline-flex; gap: 6px; align-items: baseline; -webkit-tap-highlight-color: transparent }
+button.ex-name .i { font-size: 12px; font-weight: 700; color: var(--accent); border: 1.5px solid currentColor; border-radius: 99px; padding: 0 6px; line-height: 1.5 }
+button.ex-name:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px }
+.coach-btn { justify-self: start }
+.sheet-bg { position: fixed; inset: 0; z-index: 40; background: rgba(20, 12, 6, .55); display: flex; align-items: flex-end; justify-content: center }
+.sheet { background: var(--surface); color: var(--ink); width: 100%; max-width: 640px; max-height: 92vh; overflow: auto; border-radius: 24px 24px 0 0; border: 2.5px solid var(--ink); border-bottom: 0;
+  padding: 18px 18px calc(22px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 12px }
+.sheet-head { display: flex; justify-content: space-between; gap: 12px; align-items: start }
+.sheet h3 { font-family: var(--f-title); font-size: 24px; font-weight: 900; line-height: 1.1 }
+.poses { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px }
+.poses figure { margin: 0; background: var(--bg); border-radius: 16px; padding: 8px 8px 6px; display: grid; gap: 2px }
+.poses figcaption { font-size: 12.5px; font-weight: 700; color: var(--muted); text-align: center }
+.fig { width: 100%; height: auto; display: block }
+.fig .fg { stroke: var(--ink) } .fig .head { fill: var(--surface) } .fig .floor { stroke: var(--line) }
+.fig .kb { fill: var(--accent) } .fig .bench { fill: var(--soft) } .fig .bag { fill: color-mix(in srgb, var(--accent) 75%, var(--ink)) }
+.fig .db { fill: var(--ink) } .fig .arr { stroke: var(--accent) } .fig .arrh { fill: var(--accent); stroke: none } .fig .pr { stroke: var(--muted) }
+.tips { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14.5px }
+.yt { justify-self: start; text-decoration: none }
+.coach { position: fixed; inset: 0; z-index: 30; background: var(--bg); color: var(--ink); display: flex; flex-direction: column;
+  padding: calc(18px + env(safe-area-inset-top, 0px)) max(18px, env(safe-area-inset-right, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px)) }
+.coach-in { max-width: 560px; width: 100%; margin: 0 auto; flex: 1; display: flex; flex-direction: column; gap: 14px; min-height: 0 }
+.coach-top { display: flex; justify-content: space-between; align-items: center; gap: 10px }
+.coach-phase { font-family: var(--f-display); font-weight: 900; font-size: 15px; text-transform: uppercase; letter-spacing: .08em; color: var(--accent) }
+.coach[data-phase="rest"] .coach-phase { color: var(--long) } .coach[data-phase="ready"] .coach-phase { color: var(--quality) }
+.coach[data-phase="reps"] .coach-phase { color: var(--easy) }
+.coach-name { font-family: var(--f-title); font-weight: 900; font-size: clamp(28px, 8vw, 40px); line-height: 1.05 }
+.coach-set { font-family: var(--f-mono); font-size: 15px }
+.coach-time { font-family: var(--f-display); font-weight: 900; font-size: clamp(84px, 30vw, 150px); line-height: 1; text-align: center; font-variant-numeric: tabular-nums; margin: auto 0 0 }
+.coach-bar { height: 12px; border-radius: 99px; background: var(--soft); overflow: hidden } .coach-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)) }
+.coach[data-phase="rest"] .coach-bar i { background: var(--long) }
+.coach-tip { font-size: 14px; color: var(--muted); font-style: italic; min-height: 1.5em }
+.coach-ctrl { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto }
+.coach-ctrl .ghost { font-size: 15px; padding: 12px; text-align: center; background: var(--surface) }
+.coach-done { font-size: 22px; padding: 18px; width: 100% }
 /* Перерыв в беге */
 .brk { background: color-mix(in srgb, var(--cross) 10%, var(--surface)); border-radius: 24px; padding: 14px 16px; display: grid; gap: 10px; margin-bottom: 14px }
 .brk .label { color: var(--cross) }
@@ -363,6 +398,24 @@ td.r, th.r { text-align: right }
   <div class="status" id="status">Данные хранятся на этом телефоне</div>
 </div>
 
+<div class="sheet-bg" id="sheet" hidden></div>
+<div class="coach" id="coach" hidden aria-live="polite">
+  <div class="coach-in">
+    <div class="coach-top"><span class="coach-phase" id="cPhase">Приготовься</span><span class="hint" id="cCount"></span></div>
+    <div><div class="coach-name" id="cName"></div><div class="coach-set" id="cSet"></div></div>
+    <div class="coach-tip" id="cTip"></div>
+    <div class="coach-time" id="cTime">0:10</div>
+    <div class="coach-bar"><i id="cBar"></i></div>
+    <button class="btn coach-done" id="cDone" type="button" hidden>Готово ✓</button>
+    <div class="coach-ctrl">
+      <button class="ghost" id="cPause" type="button">⏸ Пауза</button>
+      <button class="ghost" id="cSkip" type="button">⏭ Пропустить</button>
+      <button class="ghost" id="cMute" type="button">🔊 Звук вкл.</button>
+      <button class="ghost" id="cInfo" type="button">ⓘ Техника</button>
+      <button class="ghost" id="cExit" type="button" style="grid-column:1/-1">✕ Завершить</button>
+    </div>
+  </div>
+</div>
 <div class="timerbar" id="timerbar" hidden role="timer" aria-live="polite">
   <i class="tprog" id="tProg"></i>
   <b id="tTime">0:00</b>
@@ -490,8 +543,8 @@ td.r, th.r { text-align: right }
     ],
     lng: [
       { n: "Груша, ровный темп · блок 1", sets: 6, reps: "3 мин", rest: 60, hold: 180, tip: "Зона 2, ровно, без подскоков" },
-      { n: "Круг с гирей", sets: 4, reps: "10 махов + 5 тяг/руку + 5 жимов/руку", rest: 90, tip: "Без пауз внутри круга, пульс в аэробной зоне" },
       { n: "Груша, ровный темп · блок 2", sets: 6, reps: "3 мин", rest: 60, hold: 180, tip: "Тот же темп, что в первом блоке" },
+      { n: "Круг с гирей", sets: 4, reps: "10 махов + 5 тяг/руку + 5 жимов/руку", rest: 90, tip: "Без пауз внутри круга, пульс в аэробной зоне" },
       { n: "Бой с тенью с гантелями", sets: 2, reps: "3 мин", rest: 30, hold: 180, tip: "Заминка, легко" }
     ]
   };
@@ -765,7 +818,7 @@ td.r, th.r { text-align: right }
       const n = setsFor(s.wk, e.sets), st = state.sets[key + ":" + i] || {}, d = st.d || [];
       const cnt = Array.from({ length: n }, (_, k) => !!d[k]).filter(Boolean).length;
       return `<div class="ex${cnt === n ? " complete" : ""}">
-        <div class="ex-name">${e.n}</div>
+        <button class="ex-name" type="button" data-info="${s.ex}|${i}">${e.n} <span class="i">i</span></button>
         <div class="ex-meta">${n > 1 ? n + " × " : ""}${e.reps}${e.rest ? ` · отдых ${e.rest} с` : ""}</div>
         <div class="ex-tip">${e.tip}</div>
         <div class="sets">
@@ -782,7 +835,8 @@ td.r, th.r { text-align: right }
     return `<div class="tcard ${s.type}">
       <div class="tcard-head"><div><div class="label">${cross ? "Вместо бега" : "Силовая"}${s.wk >= 16 ? " · облегчённо" : ""}</div><h3>${s.title}</h3></div>
         <button class="check" aria-pressed="${done}" data-key="${key}" aria-label="Отметить выполненной: ${s.title}">✓</button></div>
-      <div class="d-desc">${s.desc} Отметь подход, и запустится таймер отдыха.${s.brk && !cross && EX[s.ex].some(e => e.legs) ? " На время перерыва подъёмы на носки убраны." : ""}</div>
+      <button class="btn coach-btn" type="button" data-coach="${key}">🔊 Вести голосом</button>
+      <div class="d-desc">${s.desc} Отметь подход, и запустится таймер отдыха. Нажми на название упражнения — покажу технику.${s.brk && !cross && EX[s.ex].some(e => e.legs) ? " На время перерыва подъёмы на носки убраны." : ""}</div>
       <div class="ex-list">${exHtml}</div>
     </div>`;
   }
@@ -933,6 +987,314 @@ splits — темп каждого километра по порядку в ф�
   $("tPlus").addEventListener("click", () => { if (timer) { timer.end += 15000; timer.total += 15000; tick(); } });
   $("tSkip").addEventListener("click", () => { timer = null; $("timerbar").hidden = true; });
 
+  // ======== Техника: схемы, подсказки, видео ========
+  const KEYMAP = {
+    "Подтягивания широким хватом": "pullWide", "Подтягивания обратным хватом": "pullRev", "Австралийские подтягивания": "aussie",
+    "Подъём прямых ног выше 90°": "legRaise", "Отжимания с ногами на возвышении": "pushDecline", "Темповые отжимания (3-1-1)": "pushTempo",
+    "Отжимания с хлопком": "pushClap", "Toes to bar": "t2b", "Болгарские выпады": "bulgarian", "Подъёмы на носки": "calf",
+    "Планка на локтях": "plank", "Подтягивания нейтральным хватом": "pullNeutral", "Подтягивания узким хватом": "pullNarrow",
+    "L-sit в висе": "lsit", "Косые подъёмы коленей": "oblique", "Archer push-up": "archer", "Классические отжимания": "push",
+    "Отжимания на кулаках с паузой": "pushFist", "Windshield wiper": "wiper", "Боковая планка": "sidePlank",
+    "Задняя поверхность бедра": "ham", "Общая гибкость": "flex",
+    "Бой с тенью с гантелями 1–2 кг": "shadow", "Бой с тенью с гантелями": "shadow",
+    "Груша, ровный темп": "bag", "Груша, ровный темп · блок 1": "bag", "Груша, ровный темп · блок 2": "bag", "Груша, заминка": "bag",
+    "Груша: 30 с максимально": "bagFast", "Махи гирей 16 кг": "swing", "Махи гирей двумя руками": "swing", "Мёртвый жук": "deadbug",
+    "Становая тяга с гирей 16 кг": "kbdl", "Тяга гири в наклоне с опорой": "kbrow", "Жим гири одной рукой": "kbpress",
+    "Ягодичный мост на одной ноге": "bridge", "Турецкий подъём": "tgu", "Круг с гирей": "circuit"
+  };
+  // Фигурка: hd голова, sh плечи, el/ha локоть/кисть, hp таз, kn/ft колено/стопа, to носок; *2 — дальняя сторона
+  const ST = { hd: [61,31], sh: [60,39], el: [60,52], ha: [60,64], hp: [58,64], kn: [58,84], ft: [58,104] };
+  const pz = (o, b = ST) => Object.assign({}, b, o);
+  const BAR = y => ["bar", 22, 98, y];
+  const pullP = sp => [
+    { hd: [60,35], sh: [60,44], el: [60 - sp*.8, 31], ha: [60 - sp, 18], el2: [60 + sp*.8, 31], ha2: [60 + sp, 18], hp: [60,68], kn: [58,84], ft: [58,100], kn2: [62,84], ft2: [62,100], props: [BAR(18)], nofloor: 1 },
+    { hd: [60,15], sh: [60,26], el: [60 - sp - 9, 30], ha: [60 - sp, 18], el2: [60 + sp + 9, 30], ha2: [60 + sp, 18], hp: [60,51], kn: [58,67], ft: [58,83], kn2: [62,67], ft2: [62,83], props: [BAR(18), ["arr", 108, 62, 108, 36]], nofloor: 1 }
+  ];
+  const HANG = { hd: [64,38], sh: [60,46], el: [60,32], ha: [60,18], hp: [60,70], kn: [60,86], ft: [60,102], props: [BAR(18)], nofloor: 1 };
+  const FRONT = pullP(14)[0];
+  const PUP = { hd: [88,72], sh: [80,76], el: [80,90], ha: [80,104], hp: [50,88], kn: [33,95], ft: [16,103] };
+  const PDN = { hd: [87,92], sh: [79,96], el: [70,92], ha: [80,104], hp: [49,99], kn: [32,101], ft: [16,104] };
+  const BENCH = (x, y, w, h) => ["bench", x, y, w, h];
+  const GUARD = { hd: [64,30], sh: [62,38], el: [70,48], ha: [70,34], el2: [66,50], ha2: [73,40], hp: [60,62], kn: [56,82], ft: [48,104], kn2: [68,82], ft2: [74,104] };
+  const JAB = pz({ el: [78,40], ha: [93,38] }, GUARD);
+  const BAGP = ["bag", 99, 8, 14, 72];
+  const SW_LO = { hd: [70,44], sh: [62,49], el: [58,62], ha: [52,76], hp: [44,66], kn: [58,84], ft: [56,104], props: [["kb", 51, 84]] };
+  const SW_HI = { hd: [62,31], sh: [60,39], el: [73,42], ha: [86,44], hp: [58,64], kn: [58,84], ft: [56,104], props: [["kb", 91, 50]] };
+  const ROWB = { hd: [94,58], sh: [86,62], el2: [86,72], ha2: [86,80], hp: [58,64], kn2: [58,80], ft2: [40,80], kn: [50,86], ft: [48,104] };
+  const ROW_DN = pz({ el: [83,76], ha: [83,90], props: [BENCH(36,80,62,24), ["kb", 83, 96]] }, ROWB);
+  const ROW_UP = pz({ el: [73,56], ha: [76,66], props: [BENCH(36,80,62,24), ["kb", 76, 73], ["arr", 104, 90, 104, 68]] }, ROWB);
+  const PR_LO = pz({ el: [68,50], ha: [66,40], props: [["kb", 69, 36]] });
+  const PR_HI = pz({ el: [62,25], ha: [62,11], props: [["kb", 63, 7]] });
+  const LIE = { hd: [20,95], sh: [28,98], hp: [54,98] };
+  const INFO = {
+    pullWide: { pos: pullP(22), tips: ["Хват шире плеч, начинай из полного виса.", "Тяни грудью к перекладине, локти ведут вниз и назад.", "Опускайся медленно, без рывков и раскачки."], yt: "подтягивания широким хватом техника" },
+    pullRev: { pos: pullP(10), tips: ["Ладони к себе, хват на ширине плеч.", "Подбородок выше перекладины, локти вдоль корпуса.", "Внизу полностью выпрямляй руки."], yt: "подтягивания обратным хватом техника" },
+    pullNeutral: { pos: pullP(12), tips: ["Ладони смотрят друг на друга (параллельные ручки).", "Лопатки сначала вниз, потом тяга.", "Вверху пауза, вниз 2 секунды."], yt: "подтягивания нейтральным хватом техника" },
+    pullNarrow: { pos: pullP(7), tips: ["Кисти близко, локти идут вперёд и вниз.", "Тянись грудью к рукам.", "Ноги вместе, корпус не раскачивай."], yt: "подтягивания узким хватом техника" },
+    aussie: { pos: [
+      { hd: [72,74], sh: [64,78], el: [65,64], ha: [66,50], hp: [42,88], kn: [29,96], ft: [15,104], props: [["bar", 54, 80, 50]] },
+      { hd: [70,51], sh: [62,56], el: [50,52], ha: [66,50], hp: [40,79], kn: [28,92], ft: [15,104], props: [["bar", 54, 80, 50], ["arr", 104, 86, 104, 60]] }
+    ], tips: ["Тело прямое от пяток до макушки, таз не провисает.", "Тяни грудь к перекладине, своди лопатки.", "Чем ниже перекладина, тем тяжелее."], yt: "австралийские подтягивания техника" },
+    legRaise: { pos: [HANG, pz({ hp: [58,70], kn: [73,61], ft: [88,52], props: [BAR(18), ["arr", 104, 96, 104, 62]] }, HANG)], tips: ["Ноги прямые, поднимай выше горизонтали.", "Без раскачки: вверх силой пресса.", "Пауза 1 секунда наверху, вниз медленно."], yt: "подъём прямых ног в висе техника" },
+    t2b: { pos: [HANG, pz({ hp: [57,68], kn: [74,52], ft: [72,26] }, HANG)], tips: ["Подкрути таз и тяни носки к перекладине.", "Руки прямые, лопатки активны.", "Опускай ноги под контролем, не бросай."], yt: "toes to bar техника" },
+    lsit: { pos: [HANG, pz({ kn: [77,70], ft: [94,70] }, HANG)], cap: ["Вис", "Удержание"], tips: ["Ноги прямые, параллельно полу.", "Носки на себя, пресс напряжён.", "Если тяжело — согни колени."], yt: "L-sit в висе на турнике" },
+    oblique: { pos: [FRONT, pz({ hp: [60,68], kn: [72,60], ft: [74,78], kn2: [70,64], ft2: [72,82] }, FRONT)], cap: ["Вис", "Колени в сторону"], tips: ["Колени к противоположному плечу.", "Без раскачки, работают косые мышцы.", "Чередуй стороны."], yt: "косые подъёмы коленей в висе" },
+    wiper: { pos: [pz({ kn: [77,70], ft: [94,70] }, HANG), pz({ hp: [60,68], kn: [76,62], ft: [92,56], kn2: [76,66], ft2: [92,60] }, FRONT)], cap: ["Ноги вверх", "Поворот в сторону"], tips: ["Подними ноги и вращай их как дворник.", "Плечи и руки неподвижны.", "Амплитуду увеличивай постепенно."], yt: "windshield wiper турник техника" },
+    push: { pos: [PUP, PDN], tips: ["Кисти под плечами, тело одной линией.", "Локти под углом около 45° к корпусу.", "Грудь почти касается пола."], yt: "классические отжимания техника" },
+    pushTempo: { pos: [PUP, PDN], cap: ["Старт", "3 с вниз · 1 с пауза · 1 с вверх"], tips: ["Вниз ровно 3 секунды.", "1 секунда пауза внизу, не ложись.", "Вверх взрывно, за 1 секунду."], yt: "темповые отжимания 3-1-1" },
+    pushFist: { pos: [PUP, PDN], cap: ["Старт", "Пауза 2 с"], tips: ["Опора на две первые костяшки, запястье прямое.", "Внизу пауза 2 секунды.", "Делай на мягком коврике."], yt: "отжимания на кулаках техника" },
+    pushClap: { pos: [PDN, { hd: [89,64], sh: [81,68], el: [90,78], ha: [94,72], el2: [88,80], ha2: [94,72], hp: [50,84], kn: [33,93], ft: [16,103] }], cap: ["Внизу", "Взрыв и хлопок"], tips: ["Толкай пол максимально резко.", "Хлопок быстро, руки сразу назад под плечи.", "Приземляйся на мягкие локти."], yt: "отжимания с хлопком техника" },
+    pushDecline: { pos: [
+      { hd: [90,72], sh: [82,77], el: [82,90], ha: [82,104], hp: [52,75], kn: [36,73], ft: [22,72], props: [BENCH(4,72,30,32)] },
+      { hd: [89,92], sh: [81,95], el: [72,90], ha: [82,104], hp: [52,84], kn: [36,78], ft: [22,72], props: [BENCH(4,72,30,32)] }
+    ], tips: ["Ноги на диване или стуле, тело прямое.", "Нагрузка уходит в верх груди и плечи.", "Таз не поднимай и не проваливай."], yt: "отжимания с ногами на возвышении техника" },
+    archer: { pos: [
+      { hd: [44,70], sh: [46,80], el: [40,92], ha: [38,104], el2: [70,90], ha2: [96,104], nolegs: 1 },
+      { hd: [76,70], sh: [74,80], el: [80,92], ha: [82,104], el2: [50,90], ha2: [24,104], nolegs: 1 }
+    ], cap: ["Влево", "Вправо"], tips: ["Руки очень широко.", "Опускайся к одной руке, вторая остаётся прямой.", "Чередуй стороны или делай по 5–6 на каждую."], yt: "archer push up техника" },
+    bulgarian: { pos: [
+      { hd: [63,32], sh: [62,40], el: [62,53], ha: [62,65], hp: [62,66], kn: [66,85], ft: [66,104], kn2: [50,82], ft2: [28,80], props: [BENCH(4,80,30,24)] },
+      { hd: [61,50], sh: [60,58], el: [60,71], ha: [60,83], hp: [58,82], kn: [74,88], ft: [70,104], kn2: [52,100], ft2: [28,80], props: [BENCH(4,80,30,24)] }
+    ], tips: ["Задняя нога на опоре, передняя стопа далеко вперёд.", "Колено передней ноги смотрит по носку.", "Опускайся вертикально вниз."], yt: "болгарские выпады техника" },
+    calf: { pos: [
+      { hd: [61,25], sh: [60,33], el: [60,46], ha: [60,58], hp: [58,58], kn: [58,78], ft: [56,98], to: [66,96], props: [["step", 60, 96, 40, 8]] },
+      { hd: [61,17], sh: [60,25], el: [60,38], ha: [60,50], hp: [58,50], kn: [58,70], ft: [58,88], to: [66,96], props: [["step", 60, 96, 40, 8]] }
+    ], cap: ["Пятка ниже ступеньки", "Наверх, пауза"], tips: ["Носок на краю ступеньки.", "Вниз медленно, ниже уровня ступеньки.", "Пауза наверху 1 секунда."], yt: "подъёмы на носки на ступеньке техника" },
+    plank: { pos: [{ hd: [88,84], sh: [80,88], el: [80,104], ha: [92,104], hp: [50,96], kn: [34,100], ft: [16,104] }], cap: ["Удержание"], tips: ["Локти под плечами.", "Ягодицы и пресс напряжены, поясница не провисает.", "Дыши ровно, не задерживай дыхание."], yt: "планка на локтях техника" },
+    sidePlank: { pos: [{ hd: [24,82], sh: [30,88], el: [30,104], ha: [42,104], el2: [42,86], ha2: [56,92], hp: [60,96], kn: [78,100], ft: [96,104] }], cap: ["Удержание"], tips: ["Локоть строго под плечом.", "Тело в одну линию, таз не опускается.", "Обе стороны одинаковое время."], yt: "боковая планка техника" },
+    ham: { pos: [
+      { hd: [40,68], sh: [40,76], el: [50,86], ha: [60,94], hp: [40,101], kn: [60,102], ft: [80,102] },
+      { hd: [70,88], sh: [62,88], el: [70,94], ha: [80,100], hp: [40,101], kn: [60,102], ft: [80,102] }
+    ], cap: ["Сидя ровно", "Наклон к носкам"], tips: ["Наклон от таза, спина длинная.", "Колени прямые, но не заблокированы.", "Без пружинящих рывков, дыши."], yt: "растяжка задней поверхности бедра" },
+    flex: { pos: [pz({ hd: [62,31], el: [60,26], ha: [60,12] }), { hd: [79,87], sh: [74,79], el: [74,92], ha: [72,102], hp: [57,62], kn: [58,83], ft: [58,104] }], cap: ["Вытяжение", "Наклон"], tips: ["Двигайся плавно, без боли.", "В каждой позиции 20–30 секунд.", "Выдох на углублении растяжки."], yt: "растяжка всего тела 15 минут" },
+    shadow: { pos: [pz({ props: [["db", 70, 34], ["db", 73, 40]] }, GUARD), pz({ props: [["db", 93, 38], ["db", 73, 40]] }, JAB)], cap: ["Стойка", "Джеб"], tips: ["Руки у подбородка, удар и сразу назад.", "Стопы стоят на полу, без подскоков.", "Дыши на каждом ударе."], yt: "бой с тенью с гантелями для начинающих" },
+    bag: { pos: [pz({ props: [BAGP] }, GUARD), pz({ props: [BAGP] }, JAB)], cap: ["Стойка", "Удар"], tips: ["Удар идёт от разворота таза и корпуса.", "Ноги на месте, вес на всей стопе — щадим голень.", "Ровный темп: должен мочь говорить фразами."], yt: "работа на боксёрской груше для начинающих" },
+    bagFast: { pos: [pz({ props: [BAGP] }, GUARD), pz({ el2: [80,42], ha2: [95,40], props: [BAGP] }, GUARD)], cap: ["Стойка", "Серия"], tips: ["30 секунд максимум ударов прямыми.", "Ноги на месте, работают руки и корпус.", "В отдых встряхни руки, восстанови дыхание."], yt: "интервальная тренировка боксёрская груша" },
+    swing: { pos: [SW_LO, SW_HI], cap: ["Замах между ног", "Толчок тазом"], tips: ["Движение от таза: назад и резко вперёд.", "Руки — просто верёвки, гиря летит до груди.", "Вверху ягодицы сжаты, спина прямая, пятки на полу."], yt: "махи гирей двумя руками техника" },
+    deadbug: { pos: [
+      pz({ el: [28,84], ha: [28,70], kn: [56,82], ft: [72,82] }, LIE),
+      pz({ el: [16,97], ha: [5,99], el2: [28,84], ha2: [28,70], kn: [72,95], ft: [90,97], kn2: [56,82], ft2: [72,82] }, LIE)
+    ], cap: ["Старт", "Рука и нога в стороны"], tips: ["Поясница всё время прижата к полу.", "Противоположные рука и нога уходят медленно.", "Выдох при опускании."], yt: "упражнение мёртвый жук техника" },
+    kbdl: { pos: [
+      { hd: [70,50], sh: [62,54], el: [62,68], ha: [62,82], hp: [44,70], kn: [62,86], ft: [60,104], props: [["kb", 62, 90]] },
+      pz({ props: [["kb", 60, 71]] })
+    ], tips: ["Таз назад, спина нейтральная.", "Вставай за счёт ягодиц, гиря близко к ногам.", "Вес на всей стопе."], yt: "становая тяга с гирей техника" },
+    kbrow: { pos: [ROW_DN, ROW_UP], cap: ["Рука прямая", "Локоть к поясу"], tips: ["Колено и рука на опоре, спина параллельно полу.", "Тяни гирю к поясу, локоть вдоль корпуса.", "Корпус не проворачивай."], yt: "тяга гири в наклоне одной рукой с опорой" },
+    kbpress: { pos: [PR_LO, PR_HI], cap: ["Гиря на груди", "Жим вверх"], tips: ["Гиря лежит на предплечье, запястье прямое.", "Жми вверх, рука у уха.", "Пресс и ягодицы напряжены, не прогибайся."], yt: "жим гири одной рукой стоя техника" },
+    bridge: { pos: [
+      pz({ el: [40,100], ha: [50,101], kn: [70,84], ft: [80,104], kn2: [70,88], ft2: [86,80] }, LIE),
+      { hd: [20,95], sh: [30,98], el: [42,100], ha: [52,101], hp: [56,84], kn: [72,78], ft: [80,104], kn2: [72,76], ft2: [88,68] }
+    ], tips: ["Опора на пятку, носок на себя.", "Поднимай таз ягодицей, не поясницей.", "Если отдаёт в голень — на двух ногах."], yt: "ягодичный мост на одной ноге техника" },
+    tgu: { pos: [
+      pz({ el: [28,84], ha: [28,70], kn: [70,86], ft: [80,104], kn2: [72,99], ft2: [90,101], props: [["kb", 28, 64]] }, LIE),
+      { hd: [44,72], sh: [40,80], el: [40,66], ha: [40,52], el2: [32,92], ha2: [26,104], hp: [56,99], kn: [70,86], ft: [80,104], kn2: [74,100], ft2: [92,102], props: [["kb", 40, 46]] },
+      PR_HI
+    ], cap: ["Лёжа, гиря вверху", "Опора на руку", "Встал"], tips: ["Смотри на гирю всё время.", "Рука с гирей прямая и вертикальная.", "Начни с лёгкой гири или без неё."], yt: "турецкий подъём с гирей техника" },
+    circuit: { pos: [SW_HI, ROW_UP, PR_HI], cap: ["10 махов", "5 тяг на руку", "5 жимов на руку"], tips: ["Упражнения идут подряд без пауз.", "Отдых только после круга.", "Темп ровный, пульс в аэробной зоне."], yt: "комплекс с гирей махи тяга жим" }
+  };
+  let figN = 0;
+  function fig(p) {
+    const id = "ah" + (++figN), L = (a, b, w, op) => a && b ? `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke-width="${w}"${op ? ` opacity="${op}"` : ""}/>` : "";
+    const g = Object.assign({ el2: p.el, ha2: p.ha, kn2: p.kn, ft2: p.ft }, p);
+    let props = "";
+    (p.props || []).forEach(q => {
+      const [t, a, b, c, d] = q;
+      if (t === "bar") props += `<line x1="${a}" y1="${c}" x2="${b}" y2="${c}" stroke-width="3" class="pr"/>`;
+      else if (t === "bench" || t === "step") props += `<rect x="${a}" y="${b}" width="${c}" height="${d}" rx="2" class="bench" stroke-width="1.5"/>`;
+      else if (t === "bag") props += `<line x1="${a + c/2}" y1="0" x2="${a + c/2}" y2="${b}" stroke-width="1.2"/><rect x="${a}" y="${b}" width="${c}" height="${d}" rx="4" class="bag" stroke-width="1.5"/>`;
+      else if (t === "kb") props += `<path d="M${a-4} ${b-3} Q${a} ${b-12} ${a+4} ${b-3}" fill="none" stroke-width="2"/><circle cx="${a}" cy="${b+1}" r="5.5" class="kb" stroke-width="1.5"/>`;
+      else if (t === "db") props += `<rect x="${a-4}" y="${b-2}" width="8" height="4" rx="1" class="db" stroke-width="1"/>`;
+      else if (t === "arr") props += `<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke-width="2" class="arr" marker-end="url(#${id})"/>`;
+    });
+    const back = p.nolegs ? L(g.sh, g.el2, 3.4, .4) + L(g.el2, g.ha2, 3.4, .4)
+      : L(g.hp, g.kn2, 3.6, .4) + L(g.kn2, g.ft2, 3.6, .4) + L(g.sh, g.el2, 3.4, .4) + L(g.el2, g.ha2, 3.4, .4);
+    const front = (p.nolegs ? "" : L(g.sh, g.hp, 4.2) + L(g.hp, g.kn, 3.8) + L(g.kn, g.ft, 3.8) + (p.to ? L(g.ft, p.to, 3.4) : ""))
+      + L(g.sh, g.el, 3.6) + L(g.el, g.ha, 3.6);
+    return `<svg viewBox="0 0 120 110" class="fig" aria-hidden="true">
+      <defs><marker id="${id}" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrh"/></marker></defs>
+      ${p.nofloor ? "" : `<line x1="2" y1="104.5" x2="118" y2="104.5" stroke-width="1.5" class="floor"/>`}
+      <g stroke-linecap="round" class="fg">${props}${back}${front}<circle cx="${g.hd[0]}" cy="${g.hd[1]}" r="6.2" class="head" stroke-width="2.4"/></g>
+    </svg>`;
+  }
+  function openInfo(e) {
+    const d = INFO[KEYMAP[e.n]], sh = $("sheet");
+    const caps = d ? (d.cap || (d.pos.length === 1 ? ["Положение"] : ["Старт", "Финиш"])) : [];
+    sh.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(e.n)}">
+      <div class="sheet-head"><div><div class="label">Техника</div><h3>${esc(e.n)}</h3></div><button class="navbtn" data-close aria-label="Закрыть">✕</button></div>
+      ${d ? `<div class="poses">${d.pos.map((p, j) => `<figure>${fig(p)}<figcaption>${caps[j] || ""}</figcaption></figure>`).join("")}</div>` : ""}
+      <div class="ex-tip">${esc(e.tip)}</div>
+      ${d ? `<ul class="tips">${d.tips.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
+      <div class="ex-meta">${e.sets > 1 ? e.sets + " × " : ""}${esc(e.reps)}${e.rest ? ` · отдых ${e.rest} с` : ""}</div>
+      <a class="btn yt" href="https://www.youtube.com/results?search_query=${encodeURIComponent(d ? d.yt : e.n + " техника")}" target="_blank" rel="noopener">▶ Видео на YouTube</a>
+    </div>`;
+    sh.hidden = false;
+  }
+  $("sheet").addEventListener("click", e => { if (e.target.id === "sheet" || e.target.closest("[data-close]")) $("sheet").hidden = true; });
+
+  // ======== Вести голосом ========
+  let coach = null, wakeLock = null, ruVoice = null;
+  const canSpeak = "speechSynthesis" in window;
+  function pickVoice() {
+    try {
+      const vs = speechSynthesis.getVoices().filter(v => /^ru/i.test(v.lang));
+      ruVoice = vs.find(v => /Milena|Милена/i.test(v.name)) || vs.find(v => v.localService) || vs[0] || null;
+    } catch (e) {}
+  }
+  if (canSpeak) { pickVoice(); try { speechSynthesis.addEventListener("voiceschanged", pickVoice); } catch (e) {} }
+  function say(t, now) {
+    if (!coach || coach.muted || !canSpeak) return;
+    try {
+      if (now) speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(t); u.lang = "ru-RU"; if (ruVoice) u.voice = ruVoice; u.rate = 1.03;
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function tone(f, d, v) {
+    if (!actx || !coach || coach.muted) return;
+    try {
+      const o = actx.createOscillator(), g = actx.createGain(), at = actx.currentTime;
+      o.frequency.value = f; g.gain.setValueAtTime(0.0001, at);
+      g.gain.exponentialRampToValueAtTime(v || 0.4, at + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, at + d);
+      o.connect(g); g.connect(actx.destination); o.start(at); o.stop(at + d + 0.03);
+    } catch (e) {}
+  }
+  async function lockScreen() { try { if ("wakeLock" in navigator && document.visibilityState === "visible") wakeLock = await navigator.wakeLock.request("screen"); } catch (e) {} }
+  function unlockScreen() { try { wakeLock && wakeLock.release(); } catch (e) {} wakeLock = null; }
+  document.addEventListener("visibilitychange", () => { if (coach && document.visibilityState === "visible") lockScreen(); });
+  const plural = (n, a, b, c) => { const m = n % 100, m1 = n % 10; return m > 10 && m < 20 ? c : m1 === 1 ? a : m1 >= 2 && m1 <= 4 ? b : c; };
+  const durWords = sec => { const m = Math.floor(sec / 60), s = sec % 60; return [m ? m + " " + plural(m, "минута", "минуты", "минут") : "", s ? s + " " + plural(s, "секунда", "секунды", "секунд") : ""].filter(Boolean).join(" "); };
+  const repWords = r => String(r).replace(/(\d+)–(\d+)/g, "от $1 до $2").replace(/\s*\/\s*ногу/g, " на каждую ногу").replace(/\s*\/\s*руку/g, " на каждую руку")
+    .replace(/\s*\/\s*сторону/g, " на каждую сторону").replace(/\bсек\b/g, "секунд").replace(/\bмин\b/g, "минуты").replace(/(\d) с\b/g, "$1 секунд");
+  const isTimed = e => !!e.hold;
+  function stepIntro(st, withName) {
+    const e = st.e;
+    return (withName ? e.n + ". " : "") + (st.n > 1 ? `Подход ${st.k + 1} из ${st.n}. ` : "") + (isTimed(e) ? durWords(e.hold) : repWords(e.reps)) + ".";
+  }
+  function setDone(c, i, k) {
+    const id = c.key + ":" + i, st = Object.assign({ d: [], r: "" }, state.sets[id]);
+    st.d = (st.d || []).slice(); st.d[k] = true;
+    for (let x = 0; x < st.d.length; x++) st.d[x] = !!st.d[x];
+    state.sets[id] = st;
+    const all = exFor(c.s).every(({ e, i: j }) => { const n = setsFor(c.s.wk, e.sets), d = (state.sets[c.key + ":" + j] || {}).d || []; return Array.from({ length: n }, (_, q) => !!d[q]).every(Boolean); });
+    if (all) state.done[c.key] = true;
+    save();
+  }
+  function startCoach(key) {
+    const item = curToday.list.find(x => x.key === key); if (!item) return;
+    const steps = [];
+    exFor(item.s).forEach(({ e, i }) => {
+      const n = setsFor(item.s.wk, e.sets), d = (state.sets[key + ":" + i] || {}).d || [];
+      for (let k = 0; k < n; k++) if (!d[k]) steps.push({ e, i, k, n });
+    });
+    ensureAudio(); timer = null; $("timerbar").hidden = true;
+    coach = { key, s: item.s, steps, idx: 0, muted: false, paused: false, phase: steps.length ? "ready" : "done", end: Date.now() + 10000, total: 10000, left: 0, lastSec: null, flags: {}, workStart: 0 };
+    $("coach").hidden = false; document.body.style.overflow = "hidden";
+    lockScreen();
+    if (!steps.length) say("Все подходы этой тренировки уже отмечены.", true);
+    else say(`Начинаем. ${stepIntro(steps[0], true)} Приготовься.`, true);
+    renderCoach();
+  }
+  function stopCoach() {
+    coach = null; try { canSpeak && speechSynthesis.cancel(); } catch (e) {}
+    unlockScreen(); $("coach").hidden = true; document.body.style.overflow = "";
+    renderHeader(); renderWeeks(); renderToday();
+  }
+  function setPhase(ph, sec) {
+    const c = coach; c.phase = ph; c.flags = {}; c.lastSec = null;
+    if (sec != null) { c.total = sec * 1000; c.end = Date.now() + c.total; } else { c.workStart = Date.now(); }
+  }
+  function startWork() {
+    const c = coach, st = c.steps[c.idx];
+    tone(990, 0.45, 0.5);
+    if (isTimed(st.e)) { setPhase("work", st.e.hold); say("Начали!", true); }
+    else { setPhase("reps"); say(`Начали! ${repWords(st.e.reps)}. Нажми «Готово», когда закончишь.`, true); }
+  }
+  function finishSet(mark) {
+    const c = coach, st = c.steps[c.idx];
+    if (mark) setDone(c, st.i, st.k);
+    const next = c.steps[c.idx + 1];
+    if (!next) { c.phase = "done"; tone(880, 0.3); setTimeout(() => tone(1175, 0.5), 320); say("Тренировка завершена. Отличная работа!", true); renderCoach(); return; }
+    const rest = Math.max(10, st.e.rest || 0);
+    setPhase("rest", rest);
+    say(`${mark ? "Есть. " : ""}Отдых ${durWords(rest)}.`, true);
+    renderCoach();
+  }
+  function advanceAfterRest() { coach.idx++; startWork(); renderCoach(); }
+  function coachTick() {
+    const c = coach; if (!c || c.paused) return;
+    if (c.phase === "reps") { renderCoachTime(); return; }
+    if (c.phase === "done") return;
+    const left = c.end - Date.now(), sec = Math.max(0, Math.ceil(left / 1000));
+    if (sec !== c.lastSec) {
+      c.lastSec = sec;
+      const st = c.steps[c.idx], next = c.steps[c.idx + 1];
+      if (c.phase === "rest" && sec <= 10 && !c.flags.ready && next) {
+        c.flags.ready = true;
+        say(`Приготовься. ${stepIntro(next, next.i !== st.i)}`, true);
+      }
+      if (c.phase === "work" && st.e.hold >= 60 && sec === 30 && !c.flags.h30) { c.flags.h30 = true; say("Осталось 30 секунд."); }
+      if (c.phase === "work" && st.e.hold >= 25 && sec === 10 && !c.flags.h10) { c.flags.h10 = true; say("10 секунд."); }
+      if (sec >= 1 && sec <= 3) tone(c.phase === "work" ? 520 : 660, 0.16);
+      if (sec === 0) {
+        if (c.phase === "ready") { startWork(); renderCoach(); return; }
+        else if (c.phase === "work") { tone(990, 0.6, 0.5); finishSet(true); return; }
+        else if (c.phase === "rest") { advanceAfterRest(); return; }
+      }
+    }
+    renderCoachTime();
+  }
+  setInterval(coachTick, 200);
+  const PH = { ready: "Приготовься", work: "Работа", reps: "Твой подход", rest: "Отдых", done: "Готово" };
+  function renderCoachTime() {
+    const c = coach; if (!c) return;
+    let txt = "", pct = 0;
+    if (c.phase === "reps") { const el = (c.paused ? c.left : Date.now() - c.workStart) / 1000; txt = fmtPace(Math.floor(el)); pct = 0; }
+    else if (c.phase !== "done") { const left = c.paused ? c.left : Math.max(0, c.end - Date.now()); txt = fmtPace(Math.ceil(left / 1000)); pct = 100 - left / c.total * 100; }
+    $("cTime").textContent = txt; $("cBar").style.width = pct + "%";
+  }
+  function renderCoach() {
+    const c = coach; if (!c) return;
+    const st = c.steps[c.idx], next = c.steps[c.idx + 1], done = c.phase === "done";
+    const showSt = c.phase === "rest" ? next : st;
+    $("coach").dataset.phase = c.phase;
+    $("cPhase").textContent = (c.paused ? "Пауза · " : "") + PH[c.phase];
+    $("cName").textContent = done ? "Тренировка завершена" : showSt.e.n;
+    $("cSet").textContent = done ? `${c.s.title}: все подходы отмечены` : (c.phase === "rest" ? "Дальше: " : "") + (showSt.n > 1 ? `подход ${showSt.k + 1} из ${showSt.n} · ` : "") + (isTimed(showSt.e) ? fmtHold(showSt.e.hold) : showSt.e.reps);
+    $("cTip").textContent = done ? "" : showSt.e.tip;
+    $("cCount").textContent = done ? "" : `Шаг ${Math.min(c.idx + 1, c.steps.length)} из ${c.steps.length}`;
+    $("cDone").hidden = c.phase !== "reps" || c.paused;
+    $("cPause").textContent = c.paused ? "▶ Продолжить" : "⏸ Пауза";
+    $("cPause").hidden = $("cSkip").hidden = $("cInfo").hidden = done;
+    $("cMute").textContent = c.muted ? "🔇 Звук выкл." : "🔊 Звук вкл.";
+    $("cExit").textContent = done ? "Закрыть" : "✕ Завершить";
+    renderCoachTime();
+  }
+  $("coach").addEventListener("click", e => {
+    const c = coach; if (!c) return;
+    const b = e.target.closest("button"); if (!b) return;
+    ensureAudio();
+    if (b.id === "cExit") { stopCoach(); return; }
+    if (b.id === "cMute") { c.muted = !c.muted; if (c.muted) { try { speechSynthesis.cancel(); } catch (x) {} } else say("Звук включён.", true); renderCoach(); return; }
+    if (b.id === "cInfo") { const st = c.phase === "rest" && c.steps[c.idx + 1] ? c.steps[c.idx + 1] : c.steps[c.idx]; openInfo(st.e); return; }
+    if (c.phase === "done") return;
+    if (b.id === "cPause") {
+      if (!c.paused) { c.paused = true; c.left = c.phase === "reps" ? Date.now() - c.workStart : Math.max(0, c.end - Date.now()); try { speechSynthesis.cancel(); } catch (x) {} say("Пауза."); }
+      else { c.paused = false; if (c.phase === "reps") c.workStart = Date.now() - c.left; else c.end = Date.now() + c.left; c.lastSec = null; say("Продолжаем.", true); lockScreen(); }
+      renderCoach(); return;
+    }
+    if (b.id === "cDone") { if (c.phase === "reps") { tone(880, 0.25); finishSet(true); } return; }
+    if (b.id === "cSkip") {
+      c.paused = false;
+      if (c.phase === "ready") { startWork(); renderCoach(); }
+      else if (c.phase === "rest") { advanceAfterRest(); }
+      else {
+        const next = c.steps[c.idx + 1];
+        if (!next) { finishSet(false); return; }
+        c.idx++; setPhase("ready", 10); say(`Пропускаем. ${stepIntro(next, next.i !== c.steps[c.idx - 1].i)} Приготовься.`, true); renderCoach();
+      }
+    }
+  });
+
   function render() { renderSettings(); renderHeader(); renderWeeks(); renderToday(); renderLog(); }
 
   // ---- События ----
@@ -957,6 +1319,10 @@ splits — темп каждого километра по порядку в ф�
   });
   document.addEventListener("click", e => {
     if (!e.target.closest("#weeks, #view-today")) return;
+    const cb = e.target.closest("[data-coach]");
+    if (cb) { startCoach(cb.dataset.coach); return; }
+    const inf = e.target.closest("[data-info]");
+    if (inf) { const [ex, i] = inf.dataset.info.split("|"); const E = EX[ex] || EX[+ex]; if (E && E[+i]) openInfo(E[+i]); return; }
     const bk = e.target.closest("[data-break]");
     if (bk) {
       const t = today0();
