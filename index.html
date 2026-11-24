@@ -410,6 +410,7 @@ button.ex-name:focus-visible { outline: 2px solid var(--accent); outline-offset:
     <div class="coach-ctrl">
       <button class="ghost" id="cPause" type="button">⏸ Пауза</button>
       <button class="ghost" id="cSkip" type="button">⏭ Пропустить</button>
+      <label class="field"><span class="label">Подсказки</span><select id="coachSound"><option value="music">Под музыку</option><option value="voice">Голос</option><option value="silent">Без звука</option></select></label>
       <button class="ghost" id="cMute" type="button">🔊 Звук вкл.</button>
       <button class="ghost" id="cInfo" type="button">ⓘ Техника</button>
       <button class="ghost" id="cExit" type="button" style="grid-column:1/-1">✕ Завершить</button>
@@ -835,7 +836,7 @@ button.ex-name:focus-visible { outline: 2px solid var(--accent); outline-offset:
     return `<div class="tcard ${s.type}">
       <div class="tcard-head"><div><div class="label">${cross ? "Вместо бега" : "Силовая"}${s.wk >= 16 ? " · облегчённо" : ""}</div><h3>${s.title}</h3></div>
         <button class="check" aria-pressed="${done}" data-key="${key}" aria-label="Отметить выполненной: ${s.title}">✓</button></div>
-      <button class="btn coach-btn" type="button" data-coach="${key}">🔊 Вести голосом</button>
+      <button class="btn coach-btn" type="button" data-coach="${key}">▶ Начать с ведущим</button>
       <div class="d-desc">${s.desc} Отметь подход, и запустится таймер отдыха. Нажми на название упражнения — покажу технику.${s.brk && !cross && EX[s.ex].some(e => e.legs) ? " На время перерыва подъёмы на носки убраны." : ""}</div>
       <div class="ex-list">${exHtml}</div>
     </div>`;
@@ -950,11 +951,29 @@ splits — темп каждого километра по порядку в ф�
 
   // ---- Таймер ----
   let timer = null, actx = null;
+  const SOUND_KEY = "gump-coach-sound";
+  let soundMode = "music";
+  try {
+    const saved = localStorage.getItem(SOUND_KEY);
+    if (["music", "voice", "silent"].includes(saved)) soundMode = saved;
+  } catch (e) {}
+  function allowAudio() {
+    if (soundMode === "silent") return false;
+    const type = soundMode === "music" ? "ambient" : "auto";
+    try {
+      if (navigator.audioSession) {
+        navigator.audioSession.type = type;
+        if (navigator.audioSession.type === type) return true;
+      }
+    } catch (e) {}
+    return soundMode === "voice";
+  }
   function ensureAudio() {
+    if (!allowAudio()) return;
     try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume(); } catch (e) {}
   }
   function beep() {
-    if (!actx) return;
+    if (!actx || !allowAudio()) return;
     try {
       [0, 0.28, 0.56].forEach(t => {
         const o = actx.createOscillator(), g = actx.createGain(), at = actx.currentTime + t;
@@ -1142,7 +1161,7 @@ splits — темп каждого километра по порядку в ф�
   }
   if (canSpeak) { pickVoice(); try { speechSynthesis.addEventListener("voiceschanged", pickVoice); } catch (e) {} }
   function say(t, now) {
-    if (!coach || coach.muted || !canSpeak) return;
+    if (soundMode !== "voice" || !coach || coach.muted || !canSpeak) return;
     try {
       if (now) speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(t); u.lang = "ru-RU"; if (ruVoice) u.voice = ruVoice; u.rate = 1.03;
@@ -1150,7 +1169,11 @@ splits — темп каждого километра по порядку в ф�
     } catch (e) {}
   }
   function tone(f, d, v) {
-    if (!actx || !coach || coach.muted) return;
+    if (!coach || coach.muted || soundMode === "silent") return;
+    if (!actx || !allowAudio()) {
+      if (d >= 0.25) { try { navigator.vibrate?.(150); } catch (e) {} }
+      return;
+    }
     try {
       const o = actx.createOscillator(), g = actx.createGain(), at = actx.currentTime;
       o.frequency.value = f; g.gain.setValueAtTime(0.0001, at);
@@ -1269,6 +1292,15 @@ splits — темп каждого километра по порядку в ф�
     $("cExit").textContent = done ? "Закрыть" : "✕ Завершить";
     renderCoachTime();
   }
+  $("coachSound").value = soundMode;
+  $("coachSound").addEventListener("change", e => {
+    if (soundMode === "voice") { try { speechSynthesis.cancel(); } catch (err) {} }
+    soundMode = e.target.value;
+    try { localStorage.setItem(SOUND_KEY, soundMode); } catch (err) {}
+    ensureAudio();
+    if (soundMode === "voice") say("Голос включён.", true);
+    else if (soundMode === "music") tone(660, 0.3);
+  });
   $("coach").addEventListener("click", e => {
     const c = coach; if (!c) return;
     const b = e.target.closest("button"); if (!b) return;
